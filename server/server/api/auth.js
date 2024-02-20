@@ -4,16 +4,16 @@ const Middleware = require('../middlewares/authMiddleware');
 const Validation = require('../helpers/validationHelper');
 const AuthHelper = require('../helpers/authHelper');
 const GeneralHelper = require('../helpers/generalHelper');
+const Decryptor = require('../utils/decryptor');
 
 const fileName = 'server/api/auth.js';
 
 const register = async (request, reply) => {
   try {
-    Validation.registerValidation(request.body);
-
-    const { name, email, password } = request.body;
-    const response = await AuthHelper.registerUser({ name, email, password });
-    
+    const decryptedData = Decryptor.decryptObject(request.body);
+    Validation.registerValidation(decryptedData);
+    const { user_name, user_email, user_password, user_role } = decryptedData;
+    const response = await AuthHelper.registerUser({ user_name, user_email, user_password, user_role });
     return reply.send(response);
   } catch (err) {
     console.log([fileName, 'register', 'ERROR'], { info: `${err}` });
@@ -23,11 +23,34 @@ const register = async (request, reply) => {
 
 const login = async (request, reply) => {
   try {
-    Validation.loginValidation(request.body);
+    const decryptedData = Decryptor.decryptObject(request.body);
+    Validation.loginValidation(decryptedData);
+    const { user_email, user_password } = decryptedData;
+    const response = await AuthHelper.login({ user_email, user_password });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'login', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
 
-    const { email, password } = request.body;
-    const response = await AuthHelper.login({ email, password });
-    
+const userDelete = async (request, reply) => {
+  try {
+    Validation.userIdValidation(request.params);
+    const { user_id } = request.params;
+    const response = await AuthHelper.userDelete({ user_id });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'login', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
+const userRestore = async (request, reply) => {
+  try {
+    Validation.userIdValidation(request.params);
+    const { user_id } = request.params;
+    const response = await AuthHelper.userRestore({ user_id });
     return reply.send(response);
   } catch (err) {
     console.log([fileName, 'login', 'ERROR'], { info: `${err}` });
@@ -43,6 +66,8 @@ const hello = async (request, reply) => {
 
 Router.post('/register', register);
 Router.post('/login', login);
-Router.get('/hello', Middleware.validateToken, hello);
+Router.post('/user-restore/:user_id', userRestore);
+Router.delete('/user-delete/:user_id', userDelete);
+Router.get('/validate-token', Middleware.validateToken, hello);
 
 module.exports = Router;

@@ -12,8 +12,8 @@ const fileName = 'server/helpers/authHelper.js';
 const salt = bcrypt.genSaltSync(10);
 
 // eslint-disable-next-line arrow-body-style
-const __hashPassword = (password) => {
-  return bcrypt.hashSync(password, salt);
+const __hashPassword = (user_password) => {
+  return bcrypt.hashSync(user_password, salt);
 }
 
 // eslint-disable-next-line arrow-body-style
@@ -27,19 +27,19 @@ const __generateToken = (data) => {
 }
 
 const registerUser = async (dataObject) => {
-  const { name, email, password } = dataObject;
+  const { user_name, user_email, user_password, user_role } = dataObject;
 
   try {
     const user = await db.User.findOne({
-      where: { email }
+      where: { user_email }
     });
     if (!_.isEmpty(user)) {
       return Promise.reject(Boom.badRequest('EMAIL_HAS_BEEN_USED'));
     }
 
-    const hashedPass = __hashPassword(password)
-    await db.User.create({ name, email, password: hashedPass });
-    
+    const hashedPass = __hashPassword(user_password)
+    await db.User.create({ user_name, user_email, user_password: hashedPass, user_role: user_role });
+
     return Promise.resolve(true);
   } catch (err) {
     console.log([fileName, 'registerUser', 'ERROR'], { info: `${err}` });
@@ -48,27 +48,71 @@ const registerUser = async (dataObject) => {
 }
 
 const login = async (dataObject) => {
-  const { email, password } = dataObject;
+  const { user_email, user_password } = dataObject;
 
   try {
     const user = await db.User.findOne({
-      where: { email }
+      where: { user_email }
     });
     if (_.isEmpty(user)) {
       return Promise.reject(Boom.notFound('USER_NOT_FOUND'));
     }
-    
-    const isPassMatched = __comparePassword(password, user.password)
-    if(!isPassMatched) {
+
+    const isPassMatched = __comparePassword(user_password, user.user_password)
+    if (!isPassMatched) {
       return Promise.reject(Boom.badRequest('WRONG_CREDENTIALS'));
     }
 
     const token = __generateToken({
-      name: user.name,
-      password: user.password
+      user_name: user.user_name,
+      user_email: user.user_email,
+      user_role: user.user_role,
     });
-    
+
     return Promise.resolve({ token });
+  } catch (err) {
+    console.log([fileName, 'login', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
+const userDelete = async (dataObject) => {
+  const { user_id } = dataObject;
+
+  try {
+    const user = await db.User.findOne({
+      where: { user_id }
+    });
+    if (_.isEmpty(user)) {
+      return Promise.reject(Boom.notFound('USER_NOT_FOUND'));
+    }
+    await db.User.destroy({
+      where: { user_id }
+    });
+
+    return Promise.resolve(true);
+  } catch (err) {
+    console.log([fileName, 'login', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
+const userRestore = async (dataObject) => {
+  const { user_id } = dataObject;
+
+  try {
+
+    await db.User.restore({
+      where: { user_id }
+    });
+    const user = await db.User.findOne({
+      where: { user_id }
+    });
+    if (_.isEmpty(user)) {
+      return Promise.reject(Boom.notFound('USER_NOT_FOUND'));
+    }
+
+    return Promise.resolve(true);
   } catch (err) {
     console.log([fileName, 'login', 'ERROR'], { info: `${err}` });
     return Promise.reject(GeneralHelper.errorResponse(err));
@@ -77,5 +121,7 @@ const login = async (dataObject) => {
 
 module.exports = {
   registerUser,
-  login
+  login,
+  userDelete,
+  userRestore
 }
