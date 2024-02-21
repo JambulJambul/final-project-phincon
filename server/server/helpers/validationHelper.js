@@ -61,10 +61,21 @@ const addArenaImageValidation = (data) => {
   }
 };
 
+const arenaIdValidation = (data) => {
+  const schema = Joi.object({
+    arena_id: Joi.number().required().description('id i.e. 1'),
+  });
+
+  if (schema.validate(data).error) {
+    throw Boom.badRequest(schema.validate(data).error);
+  }
+};
+
 module.exports = {
   registerValidation,
   loginValidation,
   userIdValidation,
   createArenaValidation,
-  addArenaImageValidation
+  addArenaImageValidation,
+  arenaIdValidation
 };

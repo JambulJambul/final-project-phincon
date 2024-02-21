@@ -75,7 +75,7 @@ const MobileToolbar = ({ userDetails, locale, theme }) => {
                                 <ListItemIcon>
                                     <AccountCircle />
                                 </ListItemIcon>
-                                <ListItemText primary={`Hi,` + userDetails?.name} />
+                                <ListItemText primary={`Hi, ` + userDetails?.user_name} />
                             </ListItem>
                             <Divider />
                             <ListItem disablePadding>

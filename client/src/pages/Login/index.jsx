@@ -76,9 +76,9 @@ const Login = ({selectAdmin}) => {
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className={classes["login-form-container"]}>
             <label htmlFor='email'>Email:</label><br />
-            <input type='email' id='email' name='email' required {...register("email")} /><br />
+            <input type='email' id='email' name='email' required {...register("user_email")} /><br />
             <label htmlFor='password'>Password:</label><br />
-            <input type='password' id='password' name='password' required  {...register("password")} /><br />
+            <input type='password' id='password' name='password' required  {...register("user_password")} /><br />
             <button type='submit'>Login</button>
             <Toaster />
           </form>

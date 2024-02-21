@@ -9,8 +9,9 @@ module.exports = (sequelize, DataTypes) => {
          */
         // eslint-disable-next-line no-unused-vars
         static associate(models) {
-            // define association here
-            // * no assoc as of now
+            ArenaImage.belongsTo(models.Arena, {
+                foreignKey: 'arena_id'
+            });
         }
     }
     ArenaImage.init({

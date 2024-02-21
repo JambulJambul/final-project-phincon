@@ -4,8 +4,16 @@ import { merge } from 'lodash';
 import request from '@utils/request';
 
 const urls = {
-  // ping: 'ping.json',
-  register: 'user/register'
+  register: 'auth/register',
+  login: 'auth/login',
+  userDelete: 'auth/user-delete',
+  userRestore: 'auth/user-restore',
+  allArena: 'arena/',
+  arenaDetails: 'arena/details',
+  createArena: 'arena/create',
+  addArenaImage: 'arena/add-arena-image',
+  restoreArena: 'arena/restore',
+  deleteArena: 'arena/delete',
 };
 
 export const callAPI = async (endpoint, method, header = {}, params = {}, data = {}) => {
@@ -39,6 +47,9 @@ export const example = (data) => {
 };
 
 export const register = (dataUser) => {
-  console.log(dataUser, '<<< DATA USER API')
   return callAPI(urls.register, 'POST', {}, {}, dataUser);
+}
+
+export const login = (dataUser) => {
+  return callAPI(urls.login, 'POST', {}, {}, dataUser);
 }

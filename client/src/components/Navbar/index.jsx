@@ -14,11 +14,11 @@ const Navbar = ({ title, locale, theme }) => {
 
   const navigate = useNavigate();
   const goHome = () => {
-    if (userDetails?.role == 1) {
+    if (userDetails?.user_role == 1) {
       navigate('/admin');
-    } else if (userDetails?.role == 2) {
+    } else if (userDetails?.user_role == 2) {
       navigate('/manager');
-    } else if (userDetails?.role == 3) {
+    } else if (userDetails?.user_role == 3) {
       navigate('/member');
     } else {
       navigate('/')
@@ -28,27 +28,30 @@ const Navbar = ({ title, locale, theme }) => {
   const [hamburgerOpen, setHamburgerOpen] = useState(false);
 
   return (
-    <div className={classes.headerWrapper} data-testid="navbar">
-      <div className={classes.contentWrapper}>
-        <div className={classes.logoImage} onClick={goHome}>
-          <img src="/vite.svg" alt="logo" className={classes.logo} />
-          <div className={classes.title}>{title}</div>
-        </div>
-        <div className={classes["hamburger-icon-wrapper"]}>
-          <MenuIcon onClick={() => setHamburgerOpen(true)}></MenuIcon>
-        </div>
-        <Drawer
-          open={hamburgerOpen}
-          anchor={"right"}
-          onClose={() => setHamburgerOpen(false)}
-        >
-          <div className={classes["drawer-wrapper"]}>
-            <MobileToolbar userDetails={userDetails} locale={locale} theme={theme} />
+    <>
+    {console.log(userDetails,"DETAILS")}
+      <div className={classes.headerWrapper} data-testid="navbar">
+        <div className={classes.contentWrapper}>
+          <div className={classes.logoImage} onClick={goHome}>
+            <img src="/vite.svg" alt="logo" className={classes.logo} />
+            <div className={classes.title}>{title}</div>
           </div>
-        </Drawer>
-        <Toolbar userDetails={userDetails} locale={locale} theme={theme} />
+          <div className={classes["hamburger-icon-wrapper"]}>
+            <MenuIcon onClick={() => setHamburgerOpen(true)}></MenuIcon>
+          </div>
+          <Drawer
+            open={hamburgerOpen}
+            anchor={"right"}
+            onClose={() => setHamburgerOpen(false)}
+          >
+            <div className={classes["drawer-wrapper"]}>
+              <MobileToolbar userDetails={userDetails} locale={locale} theme={theme} />
+            </div>
+          </Drawer>
+          <Toolbar userDetails={userDetails} locale={locale} theme={theme} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

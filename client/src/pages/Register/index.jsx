@@ -32,6 +32,7 @@ const Register = () => {
   });
 
   const onSubmit = async (data) => {
+    console.log(data)
     try {
       const encryptedData = encryptPayload(data);
       dispatch(doRegister({ encryptedData },
@@ -50,8 +51,8 @@ const Register = () => {
   };
 
   const roles = {
-    2: 'Manager',
-    3: 'User',
+    2: 'Owner',
+    3: 'Public',
   };
 
   return (
@@ -63,15 +64,15 @@ const Register = () => {
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className={classes["login-form-container"]}>
             <label htmlFor='email'>Email:</label><br />
-            <input type='email' id='email' name='email' required {...register("email")} /><br />
+            <input type='email' id='email' name='email' required {...register("user_email")} /><br />
             <label htmlFor='password'>Password:</label><br />
-            <input type='password' id='password' name='password' required  {...register("password")} /><br />
+            <input type='password' id='password' name='password' required  {...register("user_password")} /><br />
             <label htmlFor='confirmPassword'>Confirm Password:</label><br />
             <input type='password' id='confirmPassword' name='confirmPassword' required  {...register("confirmPassword")} /><br />
             <label htmlFor='name'><FormattedMessage id='profile_name' />:</label><br />
-            <input type='name' id='name' name='name' required  {...register("name")} /><br />
+            <input type='name' id='name' name='user_name' required  {...register("user_name")} /><br />
             <label className={classes["select-role"]} htmlFor="role"><FormattedMessage id='role' /></label>
-            <select className={classes["select-role-box"]} id="role" {...register("role")} defaultValue="">
+            <select className={classes["select-role-box"]} id="role" {...register("user_role")} defaultValue="">
               <option value="" disabled><FormattedMessage id='select_role'/></option>
               {Object.entries(roles).map(([key, value]) => (
                 <option key={key} value={key}>{value}</option>

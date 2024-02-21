@@ -109,7 +109,7 @@ const Toolbar = ({ userDetails, locale, theme }) => {
             <Menu open={profileMenuOpen} anchorEl={profileMenuPosition} onClose={handleProfileClose}>
                 <MenuItem disabled>
                     <div>
-                        <p>Hi, {userDetails?.name}</p>
+                        <p>Hi, {userDetails?.user_name}</p>
                     </div>
                 </MenuItem>
                 <MenuItem >

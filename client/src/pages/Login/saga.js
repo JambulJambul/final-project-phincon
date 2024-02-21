@@ -13,15 +13,15 @@ function* doLogin({ postData, cbSuccess, cbFailed }) {
         yield put(setToken(response.token));
         const decoded = jwtDecode(response.token);
         yield put(setUserDetails(decoded))
-        if (decoded.role == '1') {
+        if (decoded.user_role == '1') {
             yield put(setIsAdmin(true))
             cbSuccess && cbSuccess(1);
         } else {
             yield put(setIsAdmin(false))
-            if (decoded.role == '2') {
+            if (decoded.user_role == '2') {
                 cbSuccess && cbSuccess(2);
             }
-            if (decoded.role == '3') {
+            if (decoded.user_role == '3') {
                 cbSuccess && cbSuccess(3);
             }
         }
