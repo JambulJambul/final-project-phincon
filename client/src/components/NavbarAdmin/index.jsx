@@ -89,7 +89,7 @@ const NavbarAdmin = ({ title, locale, theme, children, userDetails }) => {
   const dispatch = useDispatch();
   const location = useLocation();
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const openLang = Boolean(menuPosition);
@@ -287,9 +287,9 @@ const NavbarAdmin = ({ title, locale, theme, children, userDetails }) => {
               userDetails?.user_role === 2 ?
                 null
                 :
-                <ListItemButton className={isSelectedLoc('/admin/user') && classes.listActive} onClick={() => navigate('/admin/user')}>
+                <ListItemButton className={isSelectedLoc('/admin/user-list') && classes.listActive} onClick={() => navigate('/admin/user-list')}>
                   <ListItemIcon>
-                    <AccountCircle className={isSelectedLoc('/admin/user') && classes.AccountCircle} />
+                    <AccountCircle className={isSelectedLoc('/admin/user-list') && classes.AccountCircle} />
                   </ListItemIcon>
                   <FormattedMessage id="drawer_user_list" />
                 </ListItemButton>

@@ -9,11 +9,11 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 
 import encryptPayload from '@utils/encryptionHelper';
-import { selectIsAdmin } from '@containers/Client/selectors';
+import { selectIsAdmin, selectUserDetails } from '@containers/Client/selectors';
 
 import classes from './style.module.scss'
 
-const Login = ({selectAdmin}) => {
+const Login = ({ selectAdmin, userDetails }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -41,11 +41,11 @@ const Login = ({selectAdmin}) => {
       dispatch(doLogin({ encryptedData }, async (role) => {
         notifySuccess("Login Successful");
         await delay(1500);
-        if(role == 1){
+        if (role == 1) {
           navigate('/admin');
         } else if (role == 2) {
           navigate('/manager')
-        }  else if (role == 3) {
+        } else if (role == 3) {
           navigate('/member')
         }
       }, (error) => {
@@ -58,14 +58,16 @@ const Login = ({selectAdmin}) => {
   };
 
   useEffect(() => {
-    if (selectAdmin) {
-      if (selectAdmin === true) {
+    if (userDetails) {
+      if (userDetails.user_role == 1) {
         navigate('/admin');
-      } else {
+      } else if (userDetails.user_role == 2) {
+        navigate('/');
+      } else if (userDetails.user_role == 3) {
         navigate('/');
       }
     }
-  }, [selectAdmin]); 
+  }, [selectAdmin]);
 
   return (
     <>
@@ -98,10 +100,12 @@ const Login = ({selectAdmin}) => {
 
 Login.propTypes = {
   selectAdmin: PropTypes.bool,
+  userDetails: PropTypes.object,
 };
 
 const mapStateToProps = createStructuredSelector({
-  selectAdmin: selectIsAdmin
+  selectAdmin: selectIsAdmin,
+  userDetails: selectUserDetails
 });
 
 export default connect(mapStateToProps)(Login);

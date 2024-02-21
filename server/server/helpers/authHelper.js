@@ -119,9 +119,47 @@ const userRestore = async (dataObject) => {
   }
 }
 
+const getAllUsers = async () => {
+  try {
+    const users = await db.User.findAll({
+      attributes: { exclude: ['user_password', 'createdAt', 'updatedAt', 'deletedAt'] },
+      order: [['user_id', 'ASC']]
+    });
+    if (_.isEmpty(users)) {
+      return Promise.reject(Boom.notFound('NO_USER_FOUND'));
+    }
+    const message = "Successfully fetched users."
+    res = { message, users }
+    return Promise.resolve(res);
+  } catch (error) {
+
+  }
+}
+
+const getUserById = async (dataObject) => {
+  const { user_id } = dataObject
+  try {
+    const users = await db.User.findOne({
+      where: { user_id },
+      attributes: { exclude: ['user_password', 'createdAt', 'updatedAt', 'deletedAt'] },
+      order: [['user_id', 'ASC']]
+    });
+    if (_.isEmpty(users)) {
+      return Promise.reject(Boom.notFound('USER_NOT_FOUND'));
+    }
+    const message = "Successfully fetched user."
+    res = { message, users }
+    return Promise.resolve(res);
+  } catch (error) {
+
+  }
+}
+
 module.exports = {
   registerUser,
   login,
   userDelete,
-  userRestore
+  userRestore,
+  getAllUsers,
+  getUserById
 }

@@ -3,6 +3,8 @@ import { combineReducers } from 'redux';
 import appReducer, { storedKey as storedAppState } from '@containers/App/reducer';
 import clientReducer, { storedKey as storedClientState } from '@containers/Client/reducer';
 import languageReducer from '@containers/Language/reducer';
+import adminUserListReducer from '@pages/AdminUserPage/reducer';
+import adminEditUserSaga from '@pages/AdminUserPage/saga';
 
 import { mapWithPersistor } from './persistence';
 
@@ -13,6 +15,8 @@ const storedReducers = {
 
 const temporaryReducers = {
   language: languageReducer,
+  adminUserList: adminUserListReducer,
+  adminEditUser: adminEditUserSaga
 };
 
 const createReducer = () => {

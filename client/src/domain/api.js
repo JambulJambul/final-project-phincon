@@ -14,6 +14,8 @@ const urls = {
   addArenaImage: 'arena/add-arena-image',
   restoreArena: 'arena/restore',
   deleteArena: 'arena/delete',
+  getAllUsers: 'auth/',
+  getUserById: 'auth/details/'
 };
 
 export const callAPI = async (endpoint, method, header = {}, params = {}, data = {}) => {
@@ -52,4 +54,18 @@ export const register = (dataUser) => {
 
 export const login = (dataUser) => {
   return callAPI(urls.login, 'POST', {}, {}, dataUser);
+}
+
+export const getAllUsers = (token) => {
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  return callAPI(urls.getAllUsers, 'GET', { authHeader });
+}
+
+export const getUserById = (id, token) => {
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  return callAPI(`${urls.getAllUsers}/${id}`, 'GET', { authHeader });
 }

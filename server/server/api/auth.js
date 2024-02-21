@@ -41,7 +41,7 @@ const userDelete = async (request, reply) => {
     const response = await AuthHelper.userDelete({ user_id });
     return reply.send(response);
   } catch (err) {
-    console.log([fileName, 'login', 'ERROR'], { info: `${err}` });
+    console.log([fileName, 'userDelete', 'ERROR'], { info: `${err}` });
     return reply.send(GeneralHelper.errorResponse(err));
   }
 }
@@ -53,21 +53,43 @@ const userRestore = async (request, reply) => {
     const response = await AuthHelper.userRestore({ user_id });
     return reply.send(response);
   } catch (err) {
-    console.log([fileName, 'login', 'ERROR'], { info: `${err}` });
+    console.log([fileName, 'userRestore', 'ERROR'], { info: `${err}` });
     return reply.send(GeneralHelper.errorResponse(err));
   }
 }
 
-// eslint-disable-next-line arrow-body-style
-const hello = async (request, reply) => {
-  // SAMPLE API WITH JWT MIDDLEWARE 
+const getAllUsers = async (_request, reply) => {
+  try {
+    const response = await AuthHelper.getAllUsers();
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'getAllUsers', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
+const getUserById = async (request, reply) => {
+  try {
+    Validation.userIdValidation(request.params);
+    const { user_id } = request.params;
+    const response = await AuthHelper.getUserById({user_id});
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'getAllUsers', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
+const hello = async (_request, reply) => {
   return reply.send('HELLO');
 }
 
+Router.get('/', Middleware.validateToken, getAllUsers);
+Router.get('/details/:user_id', Middleware.validateToken, getUserById);
+Router.get('/validate-token', Middleware.validateToken, hello);
 Router.post('/register', register);
 Router.post('/login', login);
 Router.post('/user-restore/:user_id', userRestore);
 Router.delete('/user-delete/:user_id', userDelete);
-Router.get('/validate-token', Middleware.validateToken, hello);
 
 module.exports = Router;

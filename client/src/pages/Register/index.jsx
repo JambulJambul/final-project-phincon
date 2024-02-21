@@ -32,13 +32,12 @@ const Register = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log(data)
     try {
       const encryptedData = encryptPayload(data);
       dispatch(doRegister({ encryptedData },
         async () => {
           notifySuccess("Account created");
-          await delay(3000);
+          await delay(1500);
           navigate('/login');
         },
         (error) => {

@@ -1,2 +1,9 @@
 @import '@styles/base';
 
+.page-container {
+    padding: 50px 0px;
+
+    @include apply-at-md-size {
+        padding: 100px 0px;
+    }
+}
