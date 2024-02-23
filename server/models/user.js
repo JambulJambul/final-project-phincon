@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
     user_password: DataTypes.STRING,
     user_img_url: DataTypes.TEXT,
     user_role: DataTypes.TINYINT,
+    user_suspension: {
+      type: DataTypes.TINYINT,
+      defaultValue: 1
+    }
   }, {
     sequelize,
     modelName: 'User',

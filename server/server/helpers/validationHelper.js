@@ -36,6 +36,21 @@ const userIdValidation = (data) => {
   }
 };
 
+const userEditValidation = (data) => {
+  const schema = Joi.object({
+    user_name: Joi.string().optional().description('Person\'s full name'),
+    user_img_url: Joi.string().optional().description('https://www.images.com'),
+    user_password: Joi.string().min(8).max(20).optional().description('Should be between 8-20 characters'),
+    confirmPassword: Joi.string().min(8).max(20).optional().valid(Joi.ref('user_password')).description('Should match password'),
+    user_role: Joi.number().optional().description('1 = admin, 2 = arena_owner, 3 = public'),
+    user_suspension: Joi.number().optional().description('1 = none, 2 = suspended'),
+  });
+
+  if (schema.validate(data).error) {
+    throw Boom.badRequest(schema.validate(data).error);
+  }
+};
+
 const createArenaValidation = (data) => {
   const schema = Joi.object({
     arena_name: Joi.string().required().description('Arena Name'),
@@ -77,5 +92,6 @@ module.exports = {
   userIdValidation,
   createArenaValidation,
   addArenaImageValidation,
-  arenaIdValidation
+  arenaIdValidation,
+  userEditValidation
 };

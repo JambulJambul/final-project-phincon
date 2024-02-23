@@ -53,6 +53,18 @@ const getArenaDetails = async (request, reply) => {
   }
 }
 
+const getOwnerArena = async (request, reply) => {
+  try {
+    Validation.userIdValidation(request.params);
+    const { user_id } = request.params;
+    const response = await ArenaHelper.getOwnerArena({ user_id });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'register', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
 const deleteArena = async (request, reply) => {
   try {
     Validation.arenaIdValidation(request.params);
@@ -79,6 +91,7 @@ const restoreArena = async (request, reply) => {
 
 Router.get('/', getAllArena);
 Router.get('/details/:arena_id', getArenaDetails);
+Router.get('/owner/:user_id', Middleware.validateToken, getOwnerArena);
 Router.post('/create', Middleware.validateToken, createArena);
 Router.post('/restore/:arena_id', Middleware.validateToken, restoreArena);
 Router.post('/add-arena-image', Middleware.validateToken, addArenaImage);

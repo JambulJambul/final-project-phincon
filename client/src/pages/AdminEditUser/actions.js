@@ -1,7 +1,6 @@
-import { GET_USER, SET_USER } from "./constants";
+import { GET_USER, SET_USER, UPDATE_USER } from "./constants";
 
 export const doGetUser = (data, cbSuccess, cbFailed) => {
-    console.log("TEST")
     return {
         type: GET_USER,
         data,
@@ -10,7 +9,16 @@ export const doGetUser = (data, cbSuccess, cbFailed) => {
     }
 }
 
-export const doSetUser = (userData) => ({
-    type: SET_USER,
-    userData
-})
+export const doSetUser = (userData) => {
+    return {
+        type: SET_USER,
+        userData
+    }
+}
+
+export const doUpdateUser = (userData) => {
+    return {
+        type: UPDATE_USER,
+        userData
+    }
+}

@@ -7,12 +7,37 @@
         padding: 100px 0px;
     }
 
+    .deleted-notification-box {
+        display: flex;
+        background-color: #ffcccc;
+        border: 1px solid #ff6666;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 8px;
+    }
+
+    .deleted-notification-box p {
+        color: #cc0000;
+        margin-left: 10px;
+    }
+
     .login-form-container {
         display: flex;
         flex-direction: column;
         width: 90%;
         margin: 0 auto;
         padding: 20px;
+
+        .disabled-input {
+            background-color: #f2f2f2;
+            color: #666666;
+            border: 1px solid #cccccc;
+            cursor: not-allowed;
+        }
+
+        .disabled-input::placeholder {
+            color: #999999;
+        }
     }
 
     label {
@@ -30,11 +55,15 @@
     }
 
     button {
-        background-color:  $color-dark-blue;
-        color:  $color-white;
+        background-color: $color-dark-blue;
+        color: $color-white;
         padding: 15px 20px;
         border: none;
         border-radius: 4px;
         width: 90%;
+    }
+
+    .disabled-button{
+        background-color: #cc0000;
     }
 }

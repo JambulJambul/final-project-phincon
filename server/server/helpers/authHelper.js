@@ -64,6 +64,7 @@ const login = async (dataObject) => {
     }
 
     const token = __generateToken({
+      user_id: user.user_id,
       user_name: user.user_name,
       user_email: user.user_email,
       user_role: user.user_role,
@@ -122,8 +123,9 @@ const userRestore = async (dataObject) => {
 const getAllUsers = async () => {
   try {
     const users = await db.User.findAll({
-      attributes: { exclude: ['user_password', 'createdAt', 'updatedAt', 'deletedAt'] },
-      order: [['user_id', 'ASC']]
+      attributes: { exclude: ['user_password', 'createdAt', 'updatedAt'] },
+      order: [['user_id', 'ASC']],
+      paranoid: false
     });
     if (_.isEmpty(users)) {
       return Promise.reject(Boom.notFound('NO_USER_FOUND'));
@@ -141,8 +143,9 @@ const getUserById = async (dataObject) => {
   try {
     const users = await db.User.findOne({
       where: { user_id },
-      attributes: { exclude: ['user_password', 'createdAt', 'updatedAt', 'deletedAt'] },
-      order: [['user_id', 'ASC']]
+      attributes: { exclude: ['user_password', 'createdAt', 'updatedAt'] },
+      order: [['user_id', 'ASC']],
+      paranoid: false
     });
     if (_.isEmpty(users)) {
       return Promise.reject(Boom.notFound('USER_NOT_FOUND'));
@@ -155,11 +158,44 @@ const getUserById = async (dataObject) => {
   }
 }
 
+const editUserById = async (dataObject) => {
+  const { user_id, user_name, user_password, user_role, user_img_url, user_suspension } = dataObject;
+  try {
+    const user = await db.User.findOne({
+      where: { user_id }
+    });
+    if (_.isEmpty(user)) {
+      return Promise.reject(Boom.badRequest('USER_NOT_FOUND'));
+    }
+
+    if (user_password !== undefined) {
+      const hashedPass = __hashPassword(user_password)
+      await user.update({
+        user_password: hashedPass
+      });
+    }
+
+    await user.update({
+      user_name,
+      user_role,
+      user_img_url,
+      user_suspension
+    });
+
+    return Promise.resolve(true);
+  } catch (err) {
+    console.log([fileName, 'registerUser', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
+
 module.exports = {
   registerUser,
   login,
   userDelete,
   userRestore,
   getAllUsers,
-  getUserById
+  getUserById,
+  editUserById
 }

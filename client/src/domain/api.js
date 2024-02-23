@@ -15,7 +15,9 @@ const urls = {
   restoreArena: 'arena/restore',
   deleteArena: 'arena/delete',
   getAllUsers: 'auth/',
-  getUserById: 'auth/details/'
+  getUserById: 'auth/details/',
+  updateUserById: 'auth/edit-profile/',
+  ownerArena: 'arena/owner/'
 };
 
 export const callAPI = async (endpoint, method, header = {}, params = {}, data = {}) => {
@@ -37,8 +39,6 @@ export const callAPI = async (endpoint, method, header = {}, params = {}, data =
     return responseAPI;
   });
 };
-
-// export const ping = () => callAPI(urls.ping, 'get');
 
 export const fetchPokemon = () => callAPI(urls.ditto, 'GET');
 export const example = (data) => {
@@ -63,9 +63,26 @@ export const getAllUsers = (token) => {
   return callAPI(urls.getAllUsers, 'GET', { authHeader });
 }
 
-export const getUserById = (id, token) => {
+export const getUserById = (dataObject) => {
+  const { token, user_id } = dataObject;
   const authHeader = {
     'Authorization': `Bearer ${token}`
   };
-  return callAPI(`${urls.getAllUsers}/${id}`, 'GET', { authHeader });
+  return callAPI(`${urls.getUserById}${user_id}`, 'GET', { authHeader });
+}
+
+export const updateUserById = (userData) => {
+  const { token, user_id, encryptedData } = userData;
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  return callAPI(`${urls.updateUserById}${user_id}`, 'PATCH', { authHeader }, {}, { encryptedData });
+}
+
+export const ownerArena = (data) => {
+  const { token, user_id } = data;
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  return callAPI(`${urls.updateUserById}${user_id}`, 'PATCH', { authHeader });
 }

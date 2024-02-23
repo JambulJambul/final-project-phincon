@@ -24,6 +24,10 @@ module.exports = {
         user_role: {
           type: Sequelize.TINYINT
         },
+        user_suspension: {
+          defaultValue: 1,
+          type: Sequelize.TINYINT
+        },
         createdAt: {
           type: Sequelize.DATE
         },

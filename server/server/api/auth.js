@@ -72,13 +72,29 @@ const getUserById = async (request, reply) => {
   try {
     Validation.userIdValidation(request.params);
     const { user_id } = request.params;
-    const response = await AuthHelper.getUserById({user_id});
+    const response = await AuthHelper.getUserById({ user_id });
     return reply.send(response);
   } catch (err) {
     console.log([fileName, 'getAllUsers', 'ERROR'], { info: `${err}` });
     return reply.send(GeneralHelper.errorResponse(err));
   }
 }
+
+const editUserById = async (request, reply) => {
+  try {
+    Validation.userIdValidation(request.params)
+    const { user_id } = request.params;
+    const decryptedData = Decryptor.decryptObject(request.body);
+    Validation.userEditValidation(decryptedData);
+    const { user_name, user_password, user_role, user_img_url, user_suspension } = decryptedData;
+    const response = await AuthHelper.editUserById({ user_id, user_name, user_password, user_role, user_img_url, user_suspension });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'register', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
 
 const hello = async (_request, reply) => {
   return reply.send('HELLO');
@@ -90,6 +106,7 @@ Router.get('/validate-token', Middleware.validateToken, hello);
 Router.post('/register', register);
 Router.post('/login', login);
 Router.post('/user-restore/:user_id', userRestore);
+Router.patch('/edit-profile/:user_id', Middleware.validateToken, editUserById);
 Router.delete('/user-delete/:user_id', userDelete);
 
 module.exports = Router;

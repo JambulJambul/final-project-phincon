@@ -29,7 +29,6 @@ const Navbar = ({ title, locale, theme }) => {
 
   return (
     <>
-    {console.log(userDetails,"DETAILS")}
       <div className={classes.headerWrapper} data-testid="navbar">
         <div className={classes.contentWrapper}>
           <div className={classes.logoImage} onClick={goHome}>

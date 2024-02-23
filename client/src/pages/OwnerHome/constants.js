@@ -1,0 +1,2 @@
+export const GET_OWNER_ARENA = 'GET_OWNER_ARENA'
+export const SET_OWNER_ARENA = 'SET_OWNER_ARENA'

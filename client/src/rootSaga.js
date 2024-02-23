@@ -4,7 +4,8 @@ import appSaga from '@containers/App/saga';
 import loginSaga from '@pages/Login/saga';
 import RegisterSaga from '@pages/Register/saga';
 import adminUserListSaga from '@pages/AdminUserPage/saga';
-import adminEditUserSaga from '@pages/AdminUserPage/saga';
+import adminEditUserSaga from '@pages/AdminEditUser/saga';
+import ownerHomepageSaga from '@pages/OwnerHome/saga';
 
 export default function* rootSaga() {
   yield all([
@@ -12,6 +13,7 @@ export default function* rootSaga() {
     loginSaga(),
     RegisterSaga(),
     adminUserListSaga(),
-    adminEditUserSaga()
+    adminEditUserSaga(),
+    ownerHomepageSaga()
   ]);
 }

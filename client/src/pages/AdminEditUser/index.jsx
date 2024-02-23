@@ -1,6 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import { useForm } from "react-hook-form";
-import { doRegister } from '@pages/Register/actions'
+import { doUpdateUser } from './actions';
 import { useDispatch, connect, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import { selectToken } from '@containers/Client/selectors';
+import WarningIcon from '@mui/icons-material/Warning';
 
 import encryptPayload from '@utils/encryptionHelper';
 
@@ -20,14 +21,13 @@ const AdminEditUser = ({ token }) => {
     const navigate = useNavigate();
 
     const { user_id } = useParams();
-    const data = {token, user_id}
+    const data = { token, user_id }
+
+    const userData = useSelector((state) => state.adminEditUser.userData);
 
     useEffect(() => {
         dispatch(doGetUser(data))
-    }, [token, user_id]);
-
-    const userData = useSelector((state) => state.adminEditUser.userData);
-    console.log(userData)
+    }, []);
 
     const {
         register,
@@ -47,10 +47,11 @@ const AdminEditUser = ({ token }) => {
         position: 'bottom-right'
     });
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (formData) => {
         try {
-            const encryptedData = encryptPayload(data);
-            dispatch(doRegister({ encryptedData },
+            const encryptedData = encryptPayload(formData);
+            const data = { token, user_id, encryptedData }
+            dispatch(doUpdateUser(data,
                 async () => {
                     notifySuccess("Account created");
                     await delay(1500);
@@ -70,27 +71,58 @@ const AdminEditUser = ({ token }) => {
         2: 'Owner',
         3: 'Public',
     };
+
+    const suspensionStatus = {
+        1: 'None',
+        2: 'Suspended'
+    };
     return (
         <>
             <div className={classes['page-container']}>
-                <h3>Create User</h3>
+                <h3>Edit User</h3>
+                {userData?.deletedAt &&
+                    <div className={classes['deleted-notification-box']}>
+                        <WarningIcon />
+                        <p><FormattedMessage id='deleted-user-notification' /></p>
+                    </div>
+                }
                 <form onSubmit={handleSubmit(onSubmit)} className={classes["login-form-container"]}>
                     <label htmlFor='email'>Email:</label>
-                    <input type='email' id='email' name='email' required {...register("user_email")} />
-                    <label htmlFor='password'>Password:</label>
-                    <input type='password' id='password' name='password' required  {...register("user_password")} />
-                    <label htmlFor='confirmPassword'>Confirm Password:</label>
-                    <input type='password' id='confirmPassword' name='confirmPassword' required  {...register("confirmPassword")} />
+                    <input type='email' id='email' name='email' className={classes['disabled-input']} defaultValue={userData?.user_email} readOnly />
                     <label htmlFor='name'><FormattedMessage id='profile_name' />:</label>
-                    <input type='name' id='name' name='user_name' required  {...register("user_name")} />
-                    <label className={classes["select-role"]} htmlFor="role"><FormattedMessage id='role' /></label>
-                    <select className={classes["select-role-box"]} id="role" {...register("user_role")} defaultValue="">
+                    <input type='name' id='name' name='user_name' className={classes['disabled-input']} defaultValue={userData?.user_name} readOnly />
+                    <label htmlFor="role"><FormattedMessage id='role' /></label>
+                    <select id="role" {...register("user_role")}>
                         <option value="" disabled><FormattedMessage id='select_role' /></option>
-                        {Object.entries(roles).map(([key, value]) => (
-                            <option key={key} value={key}>{value}</option>
-                        ))}
+                        {Object.entries(roles).map(([key, value]) => {
+                            if (userData?.user_role == key) {
+                                return <option key={key} value={key} selected>{value}</option>;
+                            } else {
+                                return <option key={key} value={key}>{value}</option>;
+                            }
+                        })}
                     </select>
-                    <button type='submit'><FormattedMessage id='register' /></button>
+                    <label htmlFor="suspension"><FormattedMessage id='suspension' /></label>
+                    <select id="suspension" {...register("user_suspension")}>
+                        <option value="" disabled><FormattedMessage id='select_suspension' /></option>
+                        {Object.entries(suspensionStatus).map(([key, value]) => {
+                            if (userData?.user_suspension == key) {
+                                return <option key={key} value={key} selected>{value}</option>;
+                            } else {
+                                return <option key={key} value={key}>{value}</option>;
+                            }
+                        })}
+                    </select>
+                    {userData?.deletedAt ? (
+                        <>
+                            <button className={classes['disabled-button']} disabled type='submit'><FormattedMessage id='not-able-deleted-user' /></button>
+                        </>
+                    ) : (
+                        <>
+                            <button type='submit'><FormattedMessage id='edit-profile' /></button>
+                        </>
+                    )
+                    }
                     <Toaster />
                 </form>
             </div>
@@ -108,5 +140,3 @@ const mapStateToProps = createStructuredSelector({
 
 
 export default connect(mapStateToProps)(AdminEditUser);
-
-

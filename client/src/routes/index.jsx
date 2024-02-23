@@ -9,6 +9,7 @@ import AdminHome from '@pages/AdminHome';
 import AdminUserPage from '@pages/AdminUserPage';
 import AdminCreateUser from '@pages/AdminCreateUser';
 import AdminEditUser from '@pages/AdminEditUser';
+import OwnerHome from '@pages/OwnerHome';
 
 const routes = [
   {
@@ -36,29 +37,41 @@ const routes = [
     path: '/admin',
     name: 'Admin Home',
     protected: true,
+    isAdmin: true,
     component: AdminHome,
-    layout: AdminLayout,
+    layout: AdminLayout
   },
   {
     path: '/admin/user-list',
     name: 'Admin User List',
     protected: true,
+    isAdmin: true,
     component: AdminUserPage,
-    layout: AdminLayout,
+    layout: AdminLayout
   },
   {
     path: '/admin/create-user',
     name: 'Admin User List',
     protected: true,
+    isAdmin: true,
     component: AdminCreateUser,
-    layout: AdminLayout,
+    layout: AdminLayout
   },
   {
     path: '/admin/edit-user/:user_id',
     name: 'Admin Edit User',
     protected: true,
+    isAdmin: true,
     component: AdminEditUser,
-    layout: AdminLayout,
+    layout: AdminLayout
+  },
+  {
+    path: '/owner',
+    name: 'Admin Edit User',
+    protected: true,
+    isOwner: true,
+    component: OwnerHome,
+    layout: MainLayout
   },
   { path: '*', name: 'Not Found', component: NotFound, layout: MainLayout, protected: false },
 ];

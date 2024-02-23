@@ -4,7 +4,8 @@ import appReducer, { storedKey as storedAppState } from '@containers/App/reducer
 import clientReducer, { storedKey as storedClientState } from '@containers/Client/reducer';
 import languageReducer from '@containers/Language/reducer';
 import adminUserListReducer from '@pages/AdminUserPage/reducer';
-import adminEditUserSaga from '@pages/AdminUserPage/saga';
+import adminEditUserReducer from '@pages/AdminEditUser/reducer';
+import ownerHomepageReducer from '@pages/OwnerHome/reducer';
 
 import { mapWithPersistor } from './persistence';
 
@@ -16,7 +17,8 @@ const storedReducers = {
 const temporaryReducers = {
   language: languageReducer,
   adminUserList: adminUserListReducer,
-  adminEditUser: adminEditUserSaga
+  adminEditUser: adminEditUserReducer,
+  ownerHomepage: ownerHomepageReducer
 };
 
 const createReducer = () => {

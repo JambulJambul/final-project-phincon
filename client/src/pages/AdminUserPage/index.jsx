@@ -1,16 +1,16 @@
-import classes from "./style.module.scss";
 import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import { useDispatch, connect, useSelector } from 'react-redux';
 import { useState, useEffect } from "react";
-import { doGetAllUsers } from "./actions";
 import { Link, useParams } from "react-router-dom";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 
+import { doGetAllUsers } from "./actions";
 import { selectToken } from '@containers/Client/selectors';
 
+import classes from "./style.module.scss";
 
 const AdminUserPage = ({ token }) => {
     const dispatch = useDispatch();
@@ -37,6 +37,7 @@ const AdminUserPage = ({ token }) => {
                             <th>Email</th>
                             <th>Role</th>
                             <th>Suspension Status</th>
+                            <th>Deletion Status</th>
                             <th>Actions</th>
                         </tr>
                         {
@@ -49,6 +50,12 @@ const AdminUserPage = ({ token }) => {
                                 } else if (item.user_role === 3) {
                                     roleText = "Public"
                                 }
+                                let suspenstionText
+                                if (item.user_suspension === 1) {
+                                    suspenstionText = "None"
+                                } else if (item.user_suspension === 2) {
+                                    suspenstionText = "Suspended"
+                                }
                                 return (
                                     <>
                                         <tr key={index}>
@@ -56,7 +63,8 @@ const AdminUserPage = ({ token }) => {
                                             <td>{item.user_name}</td>
                                             <td>{item.user_email}</td>
                                             <td>{roleText}</td>
-                                            <td>None</td>
+                                            <td>{suspenstionText}</td>
+                                            <td>{item.deletedAt ? 'Deleted' : 'None'}</td>
                                             <td>
                                                 <span>
                                                     <Link to={`/admin/edit-user/${item.user_id}`}>
@@ -66,11 +74,6 @@ const AdminUserPage = ({ token }) => {
                                                 <span>
                                                     <Link>
                                                         <DeleteIcon />
-                                                    </Link>
-                                                </span>
-                                                <span>
-                                                    <Link>
-                                                        <BlockIcon />
                                                     </Link>
                                                 </span>
                                             </td>

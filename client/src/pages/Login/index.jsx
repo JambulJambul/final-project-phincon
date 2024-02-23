@@ -44,9 +44,9 @@ const Login = ({ selectAdmin, userDetails }) => {
         if (role == 1) {
           navigate('/admin');
         } else if (role == 2) {
-          navigate('/manager')
+          navigate('/owner')
         } else if (role == 3) {
-          navigate('/member')
+          navigate('/public')
         }
       }, (error) => {
         console.log(error)
