@@ -84,5 +84,5 @@ export const ownerArena = (data) => {
   const authHeader = {
     'Authorization': `Bearer ${token}`
   };
-  return callAPI(`${urls.updateUserById}${user_id}`, 'PATCH', { authHeader });
+  return callAPI(`${urls.ownerArena}${user_id}`, 'GET', { authHeader });
 }

@@ -9,6 +9,7 @@ function* doOwnerArena({ data, cbSuccess, cbFailed }) {
     yield put(setLoading(true));
     try {
         const response = yield call(ownerArena, data)
+        console.log(response)
         yield put(doSetOwnerArena(response?.arenaData))
         cbSuccess && cbSuccess();
     } catch (error) {

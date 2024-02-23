@@ -20,8 +20,8 @@ const OwnerHome = ({ token, userDetails }) => {
         dispatch(doOwnerArena(data))
     }, [token]);
 
-    const userList = useSelector((state) => state.ownerHomepage.ownerArena);
-
+    const arenaList = useSelector((state) => state.ownerHomepage.ownerArena);
+    console.log(arenaList,"HERE")
 
     return (
         <>
