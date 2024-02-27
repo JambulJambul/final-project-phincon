@@ -6,6 +6,7 @@ import languageReducer from '@containers/Language/reducer';
 import adminUserListReducer from '@pages/AdminUserPage/reducer';
 import adminEditUserReducer from '@pages/AdminEditUser/reducer';
 import ownerHomepageReducer from '@pages/OwnerHome/reducer';
+import arenaDetailsReducer from '@pages/OwnerArenaDetails/reducer';
 
 import { mapWithPersistor } from './persistence';
 
@@ -18,7 +19,8 @@ const temporaryReducers = {
   language: languageReducer,
   adminUserList: adminUserListReducer,
   adminEditUser: adminEditUserReducer,
-  ownerHomepage: ownerHomepageReducer
+  ownerHomepage: ownerHomepageReducer,
+  arenaDetails: arenaDetailsReducer
 };
 
 const createReducer = () => {

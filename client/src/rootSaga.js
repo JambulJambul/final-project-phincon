@@ -6,6 +6,7 @@ import RegisterSaga from '@pages/Register/saga';
 import adminUserListSaga from '@pages/AdminUserPage/saga';
 import adminEditUserSaga from '@pages/AdminEditUser/saga';
 import ownerHomepageSaga from '@pages/OwnerHome/saga';
+import arenaDetailsSaga from '@pages/OwnerArenaDetails/saga';
 
 export default function* rootSaga() {
   yield all([
@@ -14,6 +15,7 @@ export default function* rootSaga() {
     RegisterSaga(),
     adminUserListSaga(),
     adminEditUserSaga(),
-    ownerHomepageSaga()
+    ownerHomepageSaga(),
+    arenaDetailsSaga()
   ]);
 }

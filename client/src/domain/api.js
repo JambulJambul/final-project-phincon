@@ -17,7 +17,8 @@ const urls = {
   getAllUsers: 'auth/',
   getUserById: 'auth/details/',
   updateUserById: 'auth/edit-profile/',
-  ownerArena: 'arena/owner/'
+  ownerArena: 'arena/owner/',
+  arenaDetails: 'arena/details/'
 };
 
 export const callAPI = async (endpoint, method, header = {}, params = {}, data = {}) => {
@@ -85,4 +86,8 @@ export const ownerArena = (data) => {
     'Authorization': `Bearer ${token}`
   };
   return callAPI(`${urls.ownerArena}${user_id}`, 'GET', { authHeader });
+}
+
+export const arenaDetails = (data) => {
+  return callAPI(`${urls.arenaDetails}${data}`, 'GET');
 }

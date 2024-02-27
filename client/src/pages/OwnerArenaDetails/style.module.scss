@@ -1,0 +1,49 @@
+@import '@styles/base';
+
+.page-container {
+    padding: 50px 0px;
+
+    @include apply-at-md-size {
+        padding: 50px 100px;
+    }
+
+    .arenaDetailsContainer {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .imageContainer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: start;
+        margin-top: 20px;
+    }
+
+    .arenaImage {
+        width: 400px;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .phone-box{
+        margin: 10px 0px;
+        display: flex;
+        align-items: center;
+        p{
+            margin-left: 10px;
+        }
+    }
+
+    .mapContainer {
+        margin-top: 20px;
+        height: 400px;
+        width: 50%;
+    }
+
+    .map {
+        height: 100%;
+
+    }
+}

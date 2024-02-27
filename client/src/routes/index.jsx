@@ -10,6 +10,7 @@ import AdminUserPage from '@pages/AdminUserPage';
 import AdminCreateUser from '@pages/AdminCreateUser';
 import AdminEditUser from '@pages/AdminEditUser';
 import OwnerHome from '@pages/OwnerHome';
+import OwnerArenaDetails from '@pages/OwnerArenaDetails';
 
 const routes = [
   {
@@ -71,6 +72,14 @@ const routes = [
     protected: true,
     isOwner: true,
     component: OwnerHome,
+    layout: MainLayout
+  },
+  {
+    path: '/owner/arena-details/:arena_id',
+    name: 'Owner Arena Details',
+    protected: true,
+    isOwner: true,
+    component: OwnerArenaDetails,
     layout: MainLayout
   },
   { path: '*', name: 'Not Found', component: NotFound, layout: MainLayout, protected: false },

@@ -1,1 +1,49 @@
 @import '@styles/base';
+
+.page-container {
+    padding: 50px 0px;
+
+    @include apply-at-md-size {
+        padding: 50px 100px;
+    }
+
+    h4 {
+        text-decoration: underline;
+    }
+
+    .arena-row {
+        display: flex;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    .arena-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .arena-card {
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        cursor: pointer;
+
+    }
+
+    .arena-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .arena-card img {
+        width: 100%;
+        height: 200px;
+
+    }
+}
