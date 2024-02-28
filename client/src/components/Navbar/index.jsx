@@ -17,9 +17,9 @@ const Navbar = ({ title, locale, theme }) => {
     if (userDetails?.user_role == 1) {
       navigate('/admin');
     } else if (userDetails?.user_role == 2) {
-      navigate('/manager');
+      navigate('/owner');
     } else if (userDetails?.user_role == 3) {
-      navigate('/member');
+      navigate('/public');
     } else {
       navigate('/')
     }

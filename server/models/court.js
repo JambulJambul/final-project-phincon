@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true
         },
         arena_id: DataTypes.INTEGER,
-        court_number: DataTypes.STRING,
+        court_name: DataTypes.STRING,
     }, {
         sequelize,
         modelName: 'Court',

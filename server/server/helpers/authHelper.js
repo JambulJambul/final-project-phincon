@@ -189,7 +189,6 @@ const editUserById = async (dataObject) => {
   }
 }
 
-
 module.exports = {
   registerUser,
   login,

@@ -86,6 +86,38 @@ const arenaIdValidation = (data) => {
   }
 };
 
+const courtIdValidation = (data) => {
+  const schema = Joi.object({
+    court_id: Joi.number().required().description('id i.e. 1'),
+  });
+
+  if (schema.validate(data).error) {
+    throw Boom.badRequest(schema.validate(data).error);
+  }
+};
+
+const addCourtValidation = (data) => {
+  const schema = Joi.object({
+    arena_id: Joi.number().required().description('id i.e. 1'),
+    court_name: Joi.string().required().description('name i.e lapangan banteng'),
+  });
+
+  if (schema.validate(data).error) {
+    throw Boom.badRequest(schema.validate(data).error);
+  }
+};
+
+const dailyScheduleValidation = (data) => {
+  const schema = Joi.object({
+    arena_id: Joi.number().required().description('id i.e. 1'),
+    schedule_day: Joi.number().required().description('id i.e. 1'),
+  });
+
+  if (schema.validate(data).error) {
+    throw Boom.badRequest(schema.validate(data).error);
+  }
+};
+
 module.exports = {
   registerValidation,
   loginValidation,
@@ -93,5 +125,8 @@ module.exports = {
   createArenaValidation,
   addArenaImageValidation,
   arenaIdValidation,
-  userEditValidation
+  userEditValidation,
+  courtIdValidation,
+  addCourtValidation,
+  dailyScheduleValidation
 };

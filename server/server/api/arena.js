@@ -31,7 +31,7 @@ const addArenaImage = async (request, reply) => {
   }
 }
 
-const getAllArena = async (request, reply) => {
+const getAllArena = async (_request, reply) => {
   try {
     const response = await ArenaHelper.getAllArena();
     return reply.send(response);
@@ -89,12 +89,66 @@ const restoreArena = async (request, reply) => {
   }
 }
 
+const getCourtByArenaId = async (request, reply) => {
+  console.log("here get")
+
+  try {
+    Validation.arenaIdValidation(request.params);
+    const { arena_id } = request.params;
+    const response = await ArenaHelper.getCourtByArenaId({ arena_id });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'register', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
+const addCourt = async (request, reply) => {
+  try {
+    Validation.addCourtValidation(request.body);
+    const { arena_id, court_name } = request.body;
+    const response = await ArenaHelper.addCourt({ arena_id, court_name });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'register', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
+const deleteCourt = async (request, reply) => {
+  try {
+    Validation.courtIdValidation(request.params);
+    const { court_id } = request.params;
+    const response = await ArenaHelper.deleteCourt({ court_id });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'register', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
+const getDailyScheduleByArenaId = async (request, reply) => {
+  try {
+    Validation.dailyScheduleValidation(request.query);
+    const { arena_id, schedule_day } = request.query;
+    const response = await ArenaHelper.getDailyScheduleByArenaId({ arena_id, schedule_day });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'schedule', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
 Router.get('/', getAllArena);
 Router.get('/details/:arena_id', getArenaDetails);
+Router.get('/court/:arena_id', getCourtByArenaId);
+Router.get('/schedule', getDailyScheduleByArenaId);
 Router.get('/owner/:user_id', Middleware.validateToken, getOwnerArena);
+Router.post('/court/create', Middleware.validateToken, addCourt);
 Router.post('/create', Middleware.validateToken, createArena);
 Router.post('/restore/:arena_id', Middleware.validateToken, restoreArena);
 Router.post('/add-arena-image', Middleware.validateToken, addArenaImage);
 Router.delete('/delete/:arena_id', Middleware.validateToken, deleteArena);
+Router.delete('/court/delete/:court_id', Middleware.validateToken, deleteCourt);
 
 module.exports = Router;

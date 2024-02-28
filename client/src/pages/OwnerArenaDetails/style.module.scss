@@ -27,23 +27,121 @@
         border-radius: 8px;
     }
 
-    .phone-box{
+    .phone-box {
         margin: 10px 0px;
         display: flex;
         align-items: center;
-        p{
+
+        p {
             margin-left: 10px;
+        }
+    }
+
+    .day-row {
+        display: flex;
+        margin-top: 10px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+
+        .day-box {
+            margin: 0 5px;
+            padding: 10px;
+            background-color: var(--color-text);
+            color: var(--color-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .day-box-unselected {
+            margin: 0 5px;
+            padding: 10px;
+            border: 1px solid var(--color-text);
+            color: var(--color-text);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+    }
+
+    .day-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .court-box {
+        .court-detail-box {
+            margin: 10px 0;
+
+            .MuiAccordion-root {
+                z-index: initial;
+                /* or z-index: 0 */
+            }
+
+            .schedule-grid {
+                display: grid;
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+
+                .schedule-item-box {
+                    padding: 5px;
+                    text-align: center;
+                    margin: 10px;
+                    border: 2px solid var(--color-text);
+                    color: var(--color-text);
+                    border-radius: 8px;
+                    transition: background-color 0.2s ease;
+                    cursor: pointer;
+                }
+
+                .schedule-item-box:hover {
+                    background-color: var(--color-text);
+                    color: var(--color-bg);
+                    cursor: pointer;
+
+                }
+
+                .schedule-item-box:nth-child(6n + 1) {
+                    margin-left: 0;
+                }
+
+                .schedule-item-box:nth-child(6n) {
+                    margin-right: 0;
+                }
+            }
+        }
+
+        .add-button {
+            cursor: pointer;
+            background-color: var(--color-text);
+            color: var(--color-bg);
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            border: 0;
+            padding: 8px;
+
+            p {
+                margin-left: 10px;
+            }
         }
     }
 
     .mapContainer {
         margin-top: 20px;
         height: 400px;
-        width: 50%;
     }
 
     .map {
+        width: 100%;
         height: 100%;
 
+    }
+
+    .full-width {
+        text-align: center;
+        width: 100%;
+        justify-content: center;
     }
 }

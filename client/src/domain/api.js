@@ -18,7 +18,10 @@ const urls = {
   getUserById: 'auth/details/',
   updateUserById: 'auth/edit-profile/',
   ownerArena: 'arena/owner/',
-  arenaDetails: 'arena/details/'
+  arenaDetails: 'arena/details/',
+  getArenaCourt: 'arena/court/',
+  getDailyCourtSchedule: 'arena/schedule/',
+  createCourt: 'arena/court/create'
 };
 
 export const callAPI = async (endpoint, method, header = {}, params = {}, data = {}) => {
@@ -89,5 +92,27 @@ export const ownerArena = (data) => {
 }
 
 export const arenaDetails = (data) => {
-  return callAPI(`${urls.arenaDetails}${data}`, 'GET');
+  return callAPI(`${urls.arenaDetails}${data?.arena_id}`, 'GET');
+}
+
+export const getArenaCourt = (data) => {
+  const { token, arena_id } = data
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  return callAPI(`${urls.getArenaCourt}${arena_id}`, 'GET', { authHeader });
+}
+
+export const getDailyCourtSchedule = (scheduleData) => {
+  const { arena_id, selectedDay } = scheduleData
+  return callAPI(`${urls.getDailyCourtSchedule}?arena_id=${arena_id}&schedule_day=${selectedDay}`, 'GET');
+}
+
+export const createCourt = (data) => {
+  const { arena_id, court_name, token } = data
+  const payload = { arena_id, court_name }
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  return callAPI(`${urls.createCourt}`, 'POST', { authHeader }, {}, payload);
 }

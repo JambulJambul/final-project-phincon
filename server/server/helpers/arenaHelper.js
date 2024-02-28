@@ -53,6 +53,7 @@ const getAllArena = async () => {
             arena_id: item.arena_id,
             user_id: item.user_id,
             arena_name: item.arena_name,
+            arena_desc: item.arena_desc,
             arena_latitude: item.arena_latitude,
             arena_longtitude: item.arena_longtitude,
             arena_phone: item.arena_phone,
@@ -61,7 +62,7 @@ const getAllArena = async () => {
           arenaData.push(arenaObject)
         }));
       } catch (error) {
-        console.log(error, "FETCH ARENA IMAGE ERROR")
+        console.log(error, "FETCH ARENA ERROR")
       }
     }
     const message = "Successfully fetched arenas."
@@ -101,6 +102,7 @@ const getOwnerArena = async (dataObject) => {
             arena_id: item.arena_id,
             user_id: item.user_id,
             arena_name: item.arena_name,
+            arena_desc: item.arena_desc,
             arena_latitude: item.arena_latitude,
             arena_longtitude: item.arena_longtitude,
             arena_phone: item.arena_phone,
@@ -109,7 +111,7 @@ const getOwnerArena = async (dataObject) => {
           arenaData.push(arenaObject)
         }));
       } catch (error) {
-        console.log(error, "FETCH ARENA IMAGE ERROR")
+        console.log(error, "FETCH ARENA ERROR")
       }
     }
     const message = "Successfully fetched arenas."
@@ -148,6 +150,7 @@ const getArenaDetails = async (dataObject) => {
           arena_id: arena_id,
           user_id: arena.user_id,
           arena_name: arena.arena_name,
+          arena_desc: arena.arena_desc,
           arena_latitude: arena.arena_latitude,
           arena_longtitude: arena.arena_longtitude,
           arena_phone: arena.arena_phone,
@@ -207,6 +210,103 @@ const deleteArena = async (dataObject) => {
   }
 }
 
+const getCourtByArenaId = async (dataObject) => {
+  const { arena_id } = dataObject;
+
+  try {
+    const arena = await db.Arena.findOne({
+      where: { arena_id }
+    });
+    if (_.isEmpty(arena)) {
+      return Promise.reject(Boom.notFound('ARENA_NOT_FOUND'));
+    }
+    const court = await db.Court.findAll({
+      where: { arena_id },
+      attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+    })
+    if (_.isEmpty(court)) {
+      const message = "No court found"
+      const res = { message }
+      return Promise.resolve(res);
+    }
+    const message = "Successfully fetched courts."
+    const res = { message, court }
+    return Promise.resolve(res);
+  } catch (err) {
+    console.log([fileName, 'deleteArena', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
+const addCourt = async (dataObject) => {
+  const { arena_id, court_name } = dataObject;
+
+  try {
+    const arena = await db.Arena.findOne({
+      where: { arena_id }
+    });
+    if (_.isEmpty(arena)) {
+      return Promise.reject(Boom.notFound('ARENA_NOT_FOUND'));
+    }
+
+    const court = await db.Court.create({
+      arena_id,
+      court_name
+    });
+    const message = "Successfully add court."
+    const res = { message, court }
+    return Promise.resolve(res);
+  } catch (err) {
+    console.log([fileName, 'deleteArena', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
+const deleteCourt = async (dataObject) => {
+  const { court_id } = dataObject;
+  try {
+    await db.Court.destroy({
+      where: { court_id }
+    });
+
+    return Promise.resolve(true);
+  } catch (err) {
+    console.log([fileName, 'deleteArena', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
+const getDailyScheduleByArenaId = async (dataObject) => {
+  const { arena_id, schedule_day } = dataObject;
+  console.log(arena_id, schedule_day)
+  try {
+    const court = await db.Court.findAll({
+      where: { arena_id }
+    });
+    if (_.isEmpty(court)) {
+      return Promise.reject(Boom.notFound('ARENA_NOT_FOUND'));
+    }
+    const courtIds = court.map(court => court.court_id);
+    const schedulePromises = courtIds.map(courtId =>
+      db.Schedule.findAll({
+        where: { court_id: courtId, schedule_day },
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+      })
+    );
+    const schedules = await Promise.all(schedulePromises);
+    const flattenedSchedules = schedules.flat();
+    if (_.isEmpty(flattenedSchedules)) {
+      return Promise.reject(Boom.notFound('NO_SCHEDULE_FOUND'));
+    }
+    const message = "Successfully fetched courts."
+    const res = { message, schedule: flattenedSchedules }
+    return Promise.resolve(res);
+  } catch (err) {
+    console.log([fileName, 'deleteschedule', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
 module.exports = {
   createArena,
   addArenaImage,
@@ -214,5 +314,9 @@ module.exports = {
   getArenaDetails,
   deleteArena,
   restoreArena,
-  getOwnerArena
+  getOwnerArena,
+  getCourtByArenaId,
+  addCourt,
+  deleteCourt,
+  getDailyScheduleByArenaId
 }

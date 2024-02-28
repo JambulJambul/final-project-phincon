@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         user_id: DataTypes.INTEGER,
         arena_name: DataTypes.STRING,
+        arena_desc: DataTypes.TEXT,
         arena_latitude: DataTypes.STRING,
         arena_longtitude: DataTypes.STRING,
         arena_phone: DataTypes.STRING,
