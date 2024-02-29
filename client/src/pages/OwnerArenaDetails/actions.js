@@ -1,4 +1,4 @@
-import { GET_ARENA_DETAILS, SET_ARENA_DETAILS, SET_COURT, GET_DAILY_SCHEDULE, SET_DAILY_SCHEDULE, EMPTY_DAILY_SCHEDULE, CREATE_COURT } from "./constants";
+import { ADD_SCHEDULE, GET_ARENA_DETAILS, SET_ARENA_DETAILS, SET_COURT, GET_DAILY_SCHEDULE, SET_DAILY_SCHEDULE, EMPTY_DAILY_SCHEDULE, CREATE_COURT } from "./constants";
 
 export const doGetArenaDetails = (data, cbSuccess, cbFailed) => {
     return {
@@ -48,6 +48,16 @@ export const doEmptyDailyCourtSchedule = () => {
 export const doCreateCourt = (data, cbSuccess, cbFailed) => {
     return {
         type: CREATE_COURT,
+        data,
+        cbSuccess,
+        cbFailed
+    }
+}
+
+export const doAddSchedule = (data, cbSuccess, cbFailed) => {
+    console.log(data)
+    return {
+        type: ADD_SCHEDULE,
         data,
         cbSuccess,
         cbFailed

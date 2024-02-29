@@ -307,6 +307,33 @@ const getDailyScheduleByArenaId = async (dataObject) => {
   }
 }
 
+const addSchedule = async (dataObject) => {
+  const { court_id, schedule_day, schedule_start, schedule_end, schedule_price } = dataObject;
+
+  try {
+    const court = await db.Court.findOne({
+      where: { court_id }
+    });
+    if (_.isEmpty(court)) {
+      return Promise.reject(Boom.notFound('COURT_NOT_FOUND'));
+    }
+
+    const schedule = await db.Schedule.create({
+      court_id,
+      schedule_day,
+      schedule_start,
+      schedule_end,
+      schedule_price
+    });
+    const message = "Successfully add schedule."
+    const res = { message, schedule }
+    return Promise.resolve(res);
+  } catch (err) {
+    console.log([fileName, 'addSchedule', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
 module.exports = {
   createArena,
   addArenaImage,
@@ -318,5 +345,6 @@ module.exports = {
   getCourtByArenaId,
   addCourt,
   deleteCourt,
-  getDailyScheduleByArenaId
+  getDailyScheduleByArenaId,
+  addSchedule
 }

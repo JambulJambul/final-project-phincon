@@ -118,6 +118,20 @@ const dailyScheduleValidation = (data) => {
   }
 };
 
+const addScheduleValidation = (data) => {
+  const schema = Joi.object({
+    court_id: Joi.number().required().description('id i.e. 1'),
+    schedule_day: Joi.number().required().description('time i.e 04:00'),
+    schedule_start: Joi.string().regex(/^([0-1][0-9]|2[0-3]):([0-5][0-9])$/).required().description('time i.e 04:00'),
+    schedule_end: Joi.string().regex(/^([0-1][0-9]|2[0-3]):([0-5][0-9])$/).required().description('name i.e lapangan banteng'),
+    schedule_price: Joi.number().required().description('price integer i.e 50000'),
+  });
+
+  if (schema.validate(data).error) {
+    throw Boom.badRequest(schema.validate(data).error);
+  }
+};
+
 module.exports = {
   registerValidation,
   loginValidation,
@@ -128,5 +142,6 @@ module.exports = {
   userEditValidation,
   courtIdValidation,
   addCourtValidation,
-  dailyScheduleValidation
+  dailyScheduleValidation,
+  addScheduleValidation
 };

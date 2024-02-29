@@ -17,7 +17,7 @@ import { Modal } from '@mui/material';
 
 
 import { selectToken } from '@containers/Client/selectors';
-import { doGetArenaDetails, doGetDailyCourtSchedule, doCreateCourt } from './actions';
+import { doGetArenaDetails, doGetDailyCourtSchedule, doCreateCourt, doAddSchedule } from './actions';
 import defaultArenaImg from '@static/images/arena-default.jpg';
 import "leaflet/dist/leaflet.css";
 
@@ -27,16 +27,29 @@ const OwnerArenaDetails = ({ token }) => {
     const dispatch = useDispatch();
     const { arena_id } = useParams();
     const [selectedDay, setSelectedDay] = useState(0);
+    const [selectedSchedule, setSelectedSchedule] = useState(null)
     const [createCourtModal, setcreateCourtModal] = useState(false);
     const handleCreateCourtModalOpen = () => setcreateCourtModal(true);
     const handleCreateCourtModalClose = () => setcreateCourtModal(false);
+    const [editScheduleModal, setEditScheduleModal] = useState(false);
+    const handleEditScheduleModalOpen = (scheduleItem) => {
+        setSelectedSchedule(scheduleItem)
+        setEditScheduleModal(true)
+    };
+    const handleEditScheduleModalClose = () => setEditScheduleModal(false);
+    const [addScheduleModal, setAddScheduleModal] = useState(false);
+    const [selectedCourtId, setSelectedCourtId] = useState(null)
+    const handleAddScheduleModalOpen = (court_id) => {
+        setSelectedCourtId(court_id)
+        setAddScheduleModal(true)
+    };
+    const handleAddScheduleModalClose = () => setAddScheduleModal(false);
     const data = { token, arena_id };
     const scheduleData = { arena_id, selectedDay }
     useEffect(() => {
         dispatch(doGetArenaDetails(data))
     }, [arena_id]);
     useEffect(() => {
-        console.log(scheduleData)
         dispatch(doGetDailyCourtSchedule(scheduleData))
     }, [selectedDay]);
 
@@ -63,6 +76,11 @@ const OwnerArenaDetails = ({ token }) => {
         6: 'Saturday',
     };
 
+    const timeToMinutes = (timeString) => {
+        const [hours, minutes] = timeString.split(":").map(Number);
+        return hours * 60 + minutes;
+    };
+
     const toggleSelection = (dayIndex) => {
         setSelectedDay(dayIndex);
     };
@@ -79,15 +97,72 @@ const OwnerArenaDetails = ({ token }) => {
         const court_name = formData?.court_name
         const arena_id = arenaDetails?.arena_id;
         const data = { court_name, arena_id, token }
-        try {
-            dispatch(doCreateCourt(data, () => {
-                notifySuccess("Create court successful");
-            }, (error) => {
-                console.log(error)
-                notifyError(error || "Create court failed");
-            }))
-        } catch (error) {
-            console.error(error);
+        const isCourtNameExists = courtData.some(court => court.court_name == court_name);
+
+        if (isCourtNameExists) {
+            notifyError("Court name already exists. Please choose a different name.");
+            handleCreateCourtModalClose()
+        } else {
+            try {
+                dispatch(doCreateCourt(data, () => {
+                    notifySuccess("Create court successful");
+                    handleCreateCourtModalClose()
+                    dispatch(doGetArenaDetails(data))
+                }, (error) => {
+                    console.log(error)
+                    notifyError(error || "Create court failed");
+                    handleCreateCourtModalClose()
+
+                }))
+            } catch (error) {
+                console.error(error);
+                handleCreateCourtModalClose()
+
+            }
+        }
+    };
+
+    const addScheduleSubmit = async (formData) => {
+        const { schedule_start, schedule_end } = formData
+        const schedule_price = parseInt(formData.schedule_price)
+        const data = { token, selectedCourtId, selectedDay, schedule_start, schedule_end, schedule_price }
+        const selectedDaySchedules = dailyCourtSchedule.filter(schedule => {
+            return schedule.schedule_day === selectedDay && schedule.court_id === selectedCourtId;
+        });
+
+        const newStartTime = timeToMinutes(schedule_start);
+        const newEndTime = timeToMinutes(schedule_end);
+
+        const isConflict = selectedDaySchedules.some(schedule => {
+            const existingStartTime = timeToMinutes(schedule.schedule_start);
+            const existingEndTime = timeToMinutes(schedule.schedule_end);
+
+            return (
+                (newStartTime >= existingStartTime && newStartTime < existingEndTime) ||
+                (newEndTime > existingStartTime && newEndTime <= existingEndTime) ||
+                (newStartTime <= existingStartTime && newEndTime >= existingEndTime)
+            );
+        });
+        console.log(isConflict)
+        if (isConflict == true) {
+            notifyError("Schedule conflict with the existing ones.")
+        } else {
+            try {
+                dispatch(doAddSchedule(data, () => {
+                    notifySuccess("Create schedule successful");
+                    handleAddScheduleModalClose()
+                    dispatch(doGetDailyCourtSchedule(scheduleData))
+                }, (error) => {
+                    console.log(error)
+                    notifyError(error || "Create court failed");
+                    handleAddScheduleModalClose()
+
+                }))
+            } catch (error) {
+                console.error(error);
+                handleAddScheduleModalClose()
+
+            }
         }
     };
 
@@ -143,7 +218,7 @@ const OwnerArenaDetails = ({ token }) => {
                                                     <AccordionDetails>
                                                         <div>
                                                             <h5>Daily Schedule</h5>
-                                                            < button className={classes["add-button"]}>
+                                                            <button onClick={() => handleAddScheduleModalOpen(item.court_id)} className={classes["add-button"]}>
                                                                 <AddCircleIcon />
                                                                 <p>
                                                                     Add new schedule
@@ -152,11 +227,11 @@ const OwnerArenaDetails = ({ token }) => {
                                                             {
                                                                 dailyCourtSchedule && dailyCourtSchedule.filter(schedule => schedule.court_id == item.court_id).length > 0 ? (
                                                                     <>
-                                                                        <div className={classes["schedule-grid"]}>
+                                                                        <div className={classes["schedule-grid"]}  >
                                                                             {dailyCourtSchedule
                                                                                 .filter(schedule => schedule.court_id == item.court_id)
                                                                                 .map((scheduleItem, scheduleIndex) => (
-                                                                                    <div key={scheduleIndex} className={classes["schedule-item-box"]}>
+                                                                                    <div key={scheduleIndex} className={classes["schedule-item-box"]} onClick={() => handleEditScheduleModalOpen(scheduleItem)}>
                                                                                         <div>
                                                                                             {scheduleItem.schedule_start.substring(0, 5)} - {scheduleItem.schedule_end.substring(0, 5)}
                                                                                         </div>
@@ -193,22 +268,7 @@ const OwnerArenaDetails = ({ token }) => {
                             </>
                         )
                     }
-                    <Modal
-                        open={createCourtModal}
-                        onClose={handleCreateCourtModalClose}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                    >
-                        <div className={classes["create-court-modal"]}>
-                            <form onSubmit={handleSubmit(createCourtSubmit)} >
-                                <div className={classes["form-modal"]}>
-                                    <label htmlFor='court_name'>Court Name:</label><br />
-                                    <input type='text' id='court_name' name='court_name' required {...register("court_name")} /><br />
-                                    <button type='submit'>Submit</button>
-                                </div>
-                            </form>
-                        </div>
-                    </Modal>
+
                     <button onClick={handleCreateCourtModalOpen} className={[`${classes["add-button"]} ${classes["full-width"]}`]}>
                         <AddCircleIcon />
                         <p>
@@ -216,6 +276,7 @@ const OwnerArenaDetails = ({ token }) => {
                         </p>
                     </button>
                 </div>
+                <h5>Arena Location</h5>
                 {
                     arenaDetails && arenaDetails?.arena_latitude != undefined && arenaDetails?.arena_longtitude != undefined ?
                         (
@@ -243,6 +304,70 @@ const OwnerArenaDetails = ({ token }) => {
                 }
             </div >
             <Toaster />
+            <Modal
+                open={addScheduleModal}
+                onClose={handleAddScheduleModalClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <div className={classes["form-modal"]}>
+                    <form onSubmit={handleSubmit(addScheduleSubmit)} >
+                        <div className={classes["form-modal"]}>
+                            <label htmlFor='schedule_start'>Start Time:</label><br />
+                            <input type='time' id='schedule_start' name='schedule_start' required {...register("schedule_start")} /><br />
+                            <label htmlFor='schedule_end'>End Time:</label><br />
+                            <input type='time' id='schedule_end' name='schedule_end' required {...register("schedule_end")} /><br />
+                            <label htmlFor='schedule_price'>Price:</label><br />
+                            <div className={classes["price-input-box"]}>
+                                <h5>Rp</h5>
+                                <input type='number' id='schedule_price' name='schedule_price' required {...register("schedule_price")} /><br />
+                            </div>
+                            <button type='submit'>Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </Modal>
+            <Modal
+                open={createCourtModal}
+                onClose={handleCreateCourtModalClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <div className={classes["form-modal"]}>
+                    <form onSubmit={handleSubmit(createCourtSubmit)} >
+                        <div className={classes["form-modal"]}>
+                            <label htmlFor='court_name'>Court Name:</label><br />
+                            <input type='text' id='court_name' name='court_name' required {...register("court_name")} /><br />
+                            <button type='submit'>Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </Modal>
+            <Modal
+                open={editScheduleModal}
+                onClose={handleEditScheduleModalClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <>
+                    <div className={classes["form-modal"]}>
+                        <form onSubmit={handleSubmit(createCourtSubmit)} >
+                            <div className={classes["form-modal"]}>
+                                <label htmlFor='schedule_start'>Start Time:</label><br />
+                                <input defaultValue={selectedSchedule?.schedule_start?.substring(0, 5)} type='time' id='schedule_start' name='schedule_start' required {...register("schedule_start")} /><br />
+                                <label htmlFor='schedule_end'>End Time:</label><br />
+                                <input defaultValue={selectedSchedule?.schedule_end?.substring(0, 5)} type='time' id='schedule_end' name='schedule_end' required {...register("schedule_end")} /><br />
+                                <label htmlFor='schedule_price'>Price:</label><br />
+                                <div className={classes["price-input-box"]}>
+                                    <h5>Rp</h5>
+                                    <input defaultValue={selectedSchedule?.schedule_price} type='number' id='schedule_price' name='schedule_price' required {...register("schedule_price")} /><br />
+                                </div>
+                                <button type='submit'>Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </>
+            </Modal>
         </>
     )
 }

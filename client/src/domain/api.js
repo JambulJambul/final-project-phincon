@@ -21,7 +21,8 @@ const urls = {
   arenaDetails: 'arena/details/',
   getArenaCourt: 'arena/court/',
   getDailyCourtSchedule: 'arena/schedule/',
-  createCourt: 'arena/court/create'
+  createCourt: 'arena/court/create',
+  addSchedule: 'arena/schedule/create',
 };
 
 export const callAPI = async (endpoint, method, header = {}, params = {}, data = {}) => {
@@ -115,4 +116,13 @@ export const createCourt = (data) => {
     'Authorization': `Bearer ${token}`
   };
   return callAPI(`${urls.createCourt}`, 'POST', { authHeader }, {}, payload);
+}
+
+export const addSchedule = (data) => {
+  const { selectedCourtId, selectedDay, schedule_start, schedule_end, schedule_price, token } = data
+  const payload = { court_id: selectedCourtId, schedule_day: selectedDay, schedule_start, schedule_end, schedule_price }
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  return callAPI(`${urls.addSchedule}`, 'POST', { authHeader }, {}, payload);
 }

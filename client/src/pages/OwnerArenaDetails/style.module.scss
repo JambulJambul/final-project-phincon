@@ -145,3 +145,47 @@
         justify-content: center;
     }
 }
+
+.form-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    background-color: var(--color-bg);
+    text-align: center;
+    width: 250px;
+    padding: 25px;
+    border-radius: 8px;
+
+    input {
+        margin: 10px 0px;
+        border: 2px solid $color-dark-blue;
+        border-radius: 8px;
+        width: 90%;
+        padding: 10px;
+    }
+
+    button {
+        margin: 20px 0px;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: $color-dark-blue;
+        color: $color-white;
+        width: 100%;
+    }
+
+    .price-input-box {
+        position: relative;
+        h5 {
+            position: absolute;
+            top: 0%;
+            left: 15px;
+            transform: translateY(-50%);
+        }
+        input{
+            width: calc(90% - 40px);
+            padding-left: 40px;
+        }
+    }
+}

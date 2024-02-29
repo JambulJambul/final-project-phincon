@@ -139,6 +139,18 @@ const getDailyScheduleByArenaId = async (request, reply) => {
   }
 }
 
+const addSchedule = async (request, reply) => {
+  try {
+    Validation.addScheduleValidation(request.body);
+    const { court_id, schedule_day, schedule_start, schedule_end, schedule_price } = request.body;
+    const response = await ArenaHelper.addSchedule({ court_id, schedule_day, schedule_start, schedule_end, schedule_price });
+    return reply.send(response);
+  } catch (err) {
+    console.log([fileName, 'register', 'ERROR'], { info: `${err}` });
+    return reply.send(GeneralHelper.errorResponse(err));
+  }
+}
+
 Router.get('/', getAllArena);
 Router.get('/details/:arena_id', getArenaDetails);
 Router.get('/court/:arena_id', getCourtByArenaId);
@@ -148,6 +160,7 @@ Router.post('/court/create', Middleware.validateToken, addCourt);
 Router.post('/create', Middleware.validateToken, createArena);
 Router.post('/restore/:arena_id', Middleware.validateToken, restoreArena);
 Router.post('/add-arena-image', Middleware.validateToken, addArenaImage);
+Router.post('/schedule/create', Middleware.validateToken, addSchedule);
 Router.delete('/delete/:arena_id', Middleware.validateToken, deleteArena);
 Router.delete('/court/delete/:court_id', Middleware.validateToken, deleteCourt);
 
