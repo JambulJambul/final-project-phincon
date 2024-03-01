@@ -17,8 +17,7 @@ import { Modal } from '@mui/material';
 
 
 import { selectToken } from '@containers/Client/selectors';
-import { doGetArenaDetails, doGetDailyCourtSchedule, doCreateCourt, doAddSchedule } from './actions';
-import defaultArenaImg from '@static/images/arena-default.jpg';
+import { doGetArenaDetails, doGetDailyCourtSchedule, doCreateCourt, doAddSchedule, doEditSchedule, doDeleteSchedule } from './actions';
 import "leaflet/dist/leaflet.css";
 
 import classes from './style.module.scss'
@@ -26,24 +25,40 @@ import classes from './style.module.scss'
 const OwnerArenaDetails = ({ token }) => {
     const dispatch = useDispatch();
     const { arena_id } = useParams();
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm()
     const [selectedDay, setSelectedDay] = useState(0);
     const [selectedSchedule, setSelectedSchedule] = useState(null)
     const [createCourtModal, setcreateCourtModal] = useState(false);
     const handleCreateCourtModalOpen = () => setcreateCourtModal(true);
-    const handleCreateCourtModalClose = () => setcreateCourtModal(false);
+    const handleCreateCourtModalClose = () => {
+        setcreateCourtModal(false)
+        reset();
+    };
     const [editScheduleModal, setEditScheduleModal] = useState(false);
     const handleEditScheduleModalOpen = (scheduleItem) => {
         setSelectedSchedule(scheduleItem)
         setEditScheduleModal(true)
     };
-    const handleEditScheduleModalClose = () => setEditScheduleModal(false);
+    const handleEditScheduleModalClose = () => {
+        setEditScheduleModal(false)
+        setSelectedSchedule(null)
+        reset();
+    };
     const [addScheduleModal, setAddScheduleModal] = useState(false);
     const [selectedCourtId, setSelectedCourtId] = useState(null)
     const handleAddScheduleModalOpen = (court_id) => {
         setSelectedCourtId(court_id)
         setAddScheduleModal(true)
     };
-    const handleAddScheduleModalClose = () => setAddScheduleModal(false);
+    const handleAddScheduleModalClose = () => {
+        setAddScheduleModal(false)
+        reset();
+    };
     const data = { token, arena_id };
     const scheduleData = { arena_id, selectedDay }
     useEffect(() => {
@@ -52,19 +67,12 @@ const OwnerArenaDetails = ({ token }) => {
     useEffect(() => {
         dispatch(doGetDailyCourtSchedule(scheduleData))
     }, [selectedDay]);
-
     const arenaDetails = useSelector((state) => state.arenaDetails.arenaData);
     console.log(arenaDetails)
     const courtData = useSelector((state) => state.arenaDetails.court);
     console.log(courtData)
     const dailyCourtSchedule = useSelector((state) => state.arenaDetails.scheduleData);
     console.log(dailyCourtSchedule)
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm()
 
     const roles = {
         0: 'Sunday',
@@ -97,8 +105,7 @@ const OwnerArenaDetails = ({ token }) => {
         const court_name = formData?.court_name
         const arena_id = arenaDetails?.arena_id;
         const data = { court_name, arena_id, token }
-        const isCourtNameExists = courtData.some(court => court.court_name == court_name);
-
+        const isCourtNameExists = courtData?.some(court => court.court_name == court_name);
         if (isCourtNameExists) {
             notifyError("Court name already exists. Please choose a different name.");
             handleCreateCourtModalClose()
@@ -112,83 +119,129 @@ const OwnerArenaDetails = ({ token }) => {
                     console.log(error)
                     notifyError(error || "Create court failed");
                     handleCreateCourtModalClose()
-
                 }))
             } catch (error) {
                 console.error(error);
                 handleCreateCourtModalClose()
-
             }
         }
     };
 
-    const addScheduleSubmit = async (formData) => {
+    const addUpdateschedule = async (formData) => {
         const { schedule_start, schedule_end } = formData
         const schedule_price = parseInt(formData.schedule_price)
-        const data = { token, selectedCourtId, selectedDay, schedule_start, schedule_end, schedule_price }
-        const selectedDaySchedules = dailyCourtSchedule.filter(schedule => {
-            return schedule.schedule_day === selectedDay && schedule.court_id === selectedCourtId;
-        });
-
-        const newStartTime = timeToMinutes(schedule_start);
-        const newEndTime = timeToMinutes(schedule_end);
-
-        const isConflict = selectedDaySchedules.some(schedule => {
-            const existingStartTime = timeToMinutes(schedule.schedule_start);
-            const existingEndTime = timeToMinutes(schedule.schedule_end);
-
-            return (
-                (newStartTime >= existingStartTime && newStartTime < existingEndTime) ||
-                (newEndTime > existingStartTime && newEndTime <= existingEndTime) ||
-                (newStartTime <= existingStartTime && newEndTime >= existingEndTime)
-            );
-        });
-        console.log(isConflict)
+        let isConflict = false
+        console.log(dailyCourtSchedule)
+        if (dailyCourtSchedule != null) {
+            const selectedDaySchedules = dailyCourtSchedule.filter(schedule => {
+                return schedule.schedule_day == selectedDay && schedule.court_id == selectedCourtId;
+            });
+            console.log(selectedDaySchedules)
+            const newStartTime = timeToMinutes(schedule_start);
+            const newEndTime = timeToMinutes(schedule_end);
+            selectedDaySchedules.forEach(schedule => {
+                const existingStartTime = timeToMinutes(schedule.schedule_start);
+                const existingEndTime = timeToMinutes(schedule.schedule_end);
+                if (
+                    newStartTime >= existingStartTime && newStartTime < existingEndTime ||
+                    newEndTime > existingStartTime && newEndTime <= existingEndTime ||
+                    newStartTime <= existingStartTime && newEndTime >= existingEndTime
+                ) {
+                    isConflict = true;
+                }
+            });
+        } else if (dailyCourtSchedule == null) {
+            isConflict = false
+        }
         if (isConflict == true) {
             notifyError("Schedule conflict with the existing ones.")
         } else {
-            try {
-                dispatch(doAddSchedule(data, () => {
-                    notifySuccess("Create schedule successful");
+            if (selectedSchedule != null) {
+                try {
+                    const selectedScheduleId = selectedSchedule?.schedule_id
+                    const data = { selectedScheduleId, token, selectedCourtId, selectedDay, schedule_start, schedule_end, schedule_price }
+                    dispatch(doEditSchedule(data, () => {
+                        notifySuccess("Create schedule successful");
+                        handleAddScheduleModalClose()
+                        dispatch(doGetDailyCourtSchedule(scheduleData))
+                    }, (error) => {
+                        console.log(error)
+                        notifyError(error || "Create court failed");
+                        handleAddScheduleModalClose()
+                    }))
+                } catch (error) {
+                    console.error(error);
                     handleAddScheduleModalClose()
-                    dispatch(doGetDailyCourtSchedule(scheduleData))
-                }, (error) => {
-                    console.log(error)
-                    notifyError(error || "Create court failed");
+                }
+            } else {
+                try {
+                    console.log(selectedCourtId)
+                    const data = { token, selectedCourtId, selectedDay, schedule_start, schedule_end, schedule_price }
+                    dispatch(doAddSchedule(data, () => {
+                        notifySuccess("Create schedule successful");
+                        handleAddScheduleModalClose()
+                        dispatch(doGetDailyCourtSchedule(scheduleData))
+                    }, (error) => {
+                        console.log(error)
+                        notifyError(error || "Create court failed");
+                        handleAddScheduleModalClose()
+                    }))
+                } catch (error) {
+                    console.error(error);
                     handleAddScheduleModalClose()
-
-                }))
-            } catch (error) {
-                console.error(error);
-                handleAddScheduleModalClose()
-
+                }
             }
         }
     };
+
+    const deleteSchedule = () => {
+        try {
+            const selectedScheduleId = selectedSchedule?.schedule_id
+            const data = { selectedScheduleId, token }
+            dispatch(doDeleteSchedule(data, () => {
+                notifySuccess("Delete schedule successful");
+                handleEditScheduleModalClose()
+                dispatch(doGetDailyCourtSchedule(scheduleData))
+            }, (error) => {
+                notifyError(error || "Delete court failed");
+                handleEditScheduleModalClose()
+            }))
+        } catch (error) {
+        }
+    }
 
     const mapCoordinate = [arenaDetails?.arena_latitude, arenaDetails?.arena_longtitude]
 
     return (
         <>
             <div className={classes["page-container"]}>
-                <h5>Arena Details</h5>
-                <h1>{arenaDetails ? arenaDetails.arena_name : "Arena Name"}</h1>
-                <div className={classes.imageContainer}>
-                    {arenaDetails?.arena_img_url.map((imageUrl, index) => (
-                        <img
-                            key={index}
-                            src={imageUrl}
-                            alt={`arena-image-${index}`}
-                            className={classes.arenaImage}
-                        />
-                    ))}
-                </div>
-                <div className={classes["arena-desc-box"]}>
-                    <h5>Arena Description</h5>
-                    <p>{arenaDetails && arenaDetails.arena_desc != null ? arenaDetails.arena_desc : "No description available"}</p>
-                </div>
-                <div className={classes["phone-box"]}>
-                    <PhoneIcon /><p>Phone: {arenaDetails ? arenaDetails.arena_phone : "Not Available"}</p>
+                <div className={classes["arena-property-box"]}>
+                    <div>
+                        <h1>{arenaDetails ? arenaDetails.arena_name : "Arena Name"}</h1>
+                        <div className={classes.imageContainer}>
+                            {arenaDetails?.arena_img_url.map((imageUrl, index) => (
+                                <img
+                                    key={index}
+                                    src={imageUrl}
+                                    alt={`arena-image-${index}`}
+                                    className={classes.arenaImage}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <h1>&nbsp;</h1>
+                        <div className={classes["arena-desc-box"]}>
+                            <h5>Arena Description</h5>
+                            <p>{arenaDetails && arenaDetails.arena_desc != null ? arenaDetails.arena_desc : "No description available"}</p>
+                        </div>
+                        <div className={classes["phone-box"]}>
+                            <PhoneIcon /><p>Phone: {arenaDetails ? arenaDetails.arena_phone : "Not Available"}</p>
+                        </div>
+                        <div>
+
+                        </div>
+                    </div>
                 </div>
                 <div className={classes["court-box"]}>
                     <h5>Court Information</h5>
@@ -229,7 +282,19 @@ const OwnerArenaDetails = ({ token }) => {
                                                                     <>
                                                                         <div className={classes["schedule-grid"]}  >
                                                                             {dailyCourtSchedule
-                                                                                .filter(schedule => schedule.court_id == item.court_id)
+                                                                                .filter(schedule => schedule.court_id == item.court_id).sort((scheduleA, scheduleB) => {
+                                                                                    const timeA = scheduleA.schedule_start.split(":");
+                                                                                    const timeB = scheduleB.schedule_start.split(":");
+                                                                                    const hoursA = parseInt(timeA[0]);
+                                                                                    const minutesA = parseInt(timeA[1]);
+                                                                                    const hoursB = parseInt(timeB[0]);
+                                                                                    const minutesB = parseInt(timeB[1]);
+                                                                                    if (hoursA !== hoursB) {
+                                                                                        return hoursA - hoursB;
+                                                                                    } else {
+                                                                                        return minutesA - minutesB;
+                                                                                    }
+                                                                                })
                                                                                 .map((scheduleItem, scheduleIndex) => (
                                                                                     <div key={scheduleIndex} className={classes["schedule-item-box"]} onClick={() => handleEditScheduleModalOpen(scheduleItem)}>
                                                                                         <div>
@@ -268,7 +333,6 @@ const OwnerArenaDetails = ({ token }) => {
                             </>
                         )
                     }
-
                     <button onClick={handleCreateCourtModalOpen} className={[`${classes["add-button"]} ${classes["full-width"]}`]}>
                         <AddCircleIcon />
                         <p>
@@ -311,8 +375,9 @@ const OwnerArenaDetails = ({ token }) => {
                 aria-describedby="modal-modal-description"
             >
                 <div className={classes["form-modal"]}>
-                    <form onSubmit={handleSubmit(addScheduleSubmit)} >
-                        <div className={classes["form-modal"]}>
+                    <h3>Create Schedule</h3>
+                    <form onSubmit={handleSubmit(addUpdateschedule)} >
+                        <div>
                             <label htmlFor='schedule_start'>Start Time:</label><br />
                             <input type='time' id='schedule_start' name='schedule_start' required {...register("schedule_start")} /><br />
                             <label htmlFor='schedule_end'>End Time:</label><br />
@@ -334,8 +399,9 @@ const OwnerArenaDetails = ({ token }) => {
                 aria-describedby="modal-modal-description"
             >
                 <div className={classes["form-modal"]}>
+                    <h3>Create Court</h3>
                     <form onSubmit={handleSubmit(createCourtSubmit)} >
-                        <div className={classes["form-modal"]}>
+                        <div>
                             <label htmlFor='court_name'>Court Name:</label><br />
                             <input type='text' id='court_name' name='court_name' required {...register("court_name")} /><br />
                             <button type='submit'>Submit</button>
@@ -351,8 +417,9 @@ const OwnerArenaDetails = ({ token }) => {
             >
                 <>
                     <div className={classes["form-modal"]}>
-                        <form onSubmit={handleSubmit(createCourtSubmit)} >
-                            <div className={classes["form-modal"]}>
+                        <h3>Edit Schedule</h3>
+                        <form onSubmit={handleSubmit(addUpdateschedule)} >
+                            <div>
                                 <label htmlFor='schedule_start'>Start Time:</label><br />
                                 <input defaultValue={selectedSchedule?.schedule_start?.substring(0, 5)} type='time' id='schedule_start' name='schedule_start' required {...register("schedule_start")} /><br />
                                 <label htmlFor='schedule_end'>End Time:</label><br />
@@ -365,6 +432,7 @@ const OwnerArenaDetails = ({ token }) => {
                                 <button type='submit'>Submit</button>
                             </div>
                         </form>
+                        <button onClick={deleteSchedule} className={classes["delete-button"]}>Delete Schedule</button>
                     </div>
                 </>
             </Modal>

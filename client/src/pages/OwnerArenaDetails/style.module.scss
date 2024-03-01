@@ -7,34 +7,36 @@
         padding: 50px 100px;
     }
 
-    .arenaDetailsContainer {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 20px;
-    }
-
-    .imageContainer {
+    .arena-property-box {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: start;
-        margin-top: 20px;
-    }
 
-    .arenaImage {
-        width: 400px;
-        height: 300px;
-        object-fit: cover;
-        border-radius: 8px;
-    }
-
-    .phone-box {
-        margin: 10px 0px;
-        display: flex;
-        align-items: center;
-
-        p {
-            margin-left: 10px;
+        .imageContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: start;
+            margin-top: 20px;
         }
+
+        .arenaImage {
+            width: 80%;
+            height: 500px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .phone-box {
+            margin: 10px 0px;
+            display: flex;
+            align-items: center;
+
+            p {
+                margin-left: 10px;
+            }
+        }
+    }
+
+    .arena-property-box>* {
+        flex: 1;
     }
 
     .day-row {
@@ -147,6 +149,10 @@
 }
 
 .form-modal {
+    h5 {
+        color: var(--color-text);
+    }
+
     position: absolute;
     top: 50%;
     left: 50%;
@@ -173,19 +179,27 @@
         background-color: $color-dark-blue;
         color: $color-white;
         width: 100%;
+        border: none;
+        cursor: pointer;
     }
 
     .price-input-box {
         position: relative;
+
         h5 {
             position: absolute;
             top: 0%;
             left: 15px;
             transform: translateY(-50%);
         }
-        input{
+
+        input {
             width: calc(90% - 40px);
             padding-left: 40px;
         }
     }
+    .delete-button{
+        background-color: red;
+    }
 }
+

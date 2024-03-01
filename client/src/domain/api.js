@@ -23,6 +23,8 @@ const urls = {
   getDailyCourtSchedule: 'arena/schedule/',
   createCourt: 'arena/court/create',
   addSchedule: 'arena/schedule/create',
+  editSchedule: 'arena/schedule/edit',
+  deleteSchedule: 'arena/schedule/delete'
 };
 
 export const callAPI = async (endpoint, method, header = {}, params = {}, data = {}) => {
@@ -125,4 +127,25 @@ export const addSchedule = (data) => {
     'Authorization': `Bearer ${token}`
   };
   return callAPI(`${urls.addSchedule}`, 'POST', { authHeader }, {}, payload);
+}
+
+export const editSchedule = (data) => {
+  const { selectedScheduleId, selectedCourtId, selectedDay, schedule_start, schedule_end, schedule_price, token } = data
+  const payload = { court_id: selectedCourtId, schedule_day: selectedDay, schedule_start, schedule_end, schedule_price }
+  const schedule_id = selectedScheduleId;
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  return callAPI(`${urls.editSchedule}/${schedule_id}`, 'PATCH', { authHeader }, {}, payload);
+}
+
+export const deleteSchedule = (data) => {
+  const { selectedScheduleId, token } = data
+  console.log(data)
+  const schedule_id = selectedScheduleId;
+  const authHeader = {
+    'Authorization': `Bearer ${token}`
+  };
+  console.log(`${urls.deleteSchedule}/${schedule_id}`)
+  return callAPI(`${urls.deleteSchedule}/${schedule_id}`, 'DELETE', { authHeader });
 }

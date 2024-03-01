@@ -118,7 +118,17 @@ const dailyScheduleValidation = (data) => {
   }
 };
 
-const addScheduleValidation = (data) => {
+const scheduleIdValidation = (data) => {
+  const schema = Joi.object({
+    schedule_id: Joi.number().required().description('id i.e. 1'),
+  });
+
+  if (schema.validate(data).error) {
+    throw Boom.badRequest(schema.validate(data).error);
+  }
+};
+
+const scheduleBodyValidation = (data) => {
   const schema = Joi.object({
     court_id: Joi.number().required().description('id i.e. 1'),
     schedule_day: Joi.number().required().description('time i.e 04:00'),
@@ -143,5 +153,6 @@ module.exports = {
   courtIdValidation,
   addCourtValidation,
   dailyScheduleValidation,
-  addScheduleValidation
+  scheduleBodyValidation,
+  scheduleIdValidation
 };

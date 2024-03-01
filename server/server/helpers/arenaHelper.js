@@ -334,6 +334,57 @@ const addSchedule = async (dataObject) => {
   }
 }
 
+const editSchedule = async (dataObject) => {
+  const { schedule_id, court_id, schedule_day, schedule_start, schedule_end, schedule_price } = dataObject;
+  try {
+    const court = await db.Court.findOne({
+      where: { court_id }
+    });
+    if (_.isEmpty(court)) {
+      return Promise.reject(Boom.notFound('COURT_NOT_FOUND'));
+    }
+    const schedule = await db.Schedule.findOne({
+      where: { schedule_id },
+    });
+    if (_.isEmpty(schedule)) {
+      return Promise.reject(Boom.notFound('SCHEDULE_NOT_FOUND'));
+    }
+    await schedule.update({
+      schedule_day,
+      schedule_start,
+      schedule_end,
+      schedule_price
+    })
+    const message = "Successfully edit schedule."
+    const res = { message, schedule }
+    return Promise.resolve(res);
+  } catch (err) {
+    console.log([fileName, 'editSchedule', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
+const deleteSchedule = async (dataObject) => {
+  const { schedule_id } = dataObject;
+
+  try {
+    const schedule = await db.Schedule.findOne({
+      where: { schedule_id }
+    });
+    if (_.isEmpty(schedule)) {
+      return Promise.reject(Boom.notFound('SCHEDULE_NOT_FOUND'));
+    }
+    await db.Schedule.destroy({
+      where: { schedule_id }
+    });
+
+    return Promise.resolve(true);
+  } catch (err) {
+    console.log([fileName, 'deleteSchedule', 'ERROR'], { info: `${err}` });
+    return Promise.reject(GeneralHelper.errorResponse(err));
+  }
+}
+
 module.exports = {
   createArena,
   addArenaImage,
@@ -346,5 +397,7 @@ module.exports = {
   addCourt,
   deleteCourt,
   getDailyScheduleByArenaId,
-  addSchedule
+  addSchedule,
+  editSchedule,
+  deleteSchedule
 }

@@ -1,4 +1,4 @@
-import { ADD_SCHEDULE, GET_ARENA_DETAILS, SET_ARENA_DETAILS, SET_COURT, GET_DAILY_SCHEDULE, SET_DAILY_SCHEDULE, EMPTY_DAILY_SCHEDULE, CREATE_COURT } from "./constants";
+import { EDIT_SCHEDULE, ADD_SCHEDULE, GET_ARENA_DETAILS, SET_ARENA_DETAILS, SET_COURT, GET_DAILY_SCHEDULE, SET_DAILY_SCHEDULE, EMPTY_DAILY_SCHEDULE, CREATE_COURT, DELETE_SCHEDULE } from "./constants";
 
 export const doGetArenaDetails = (data, cbSuccess, cbFailed) => {
     return {
@@ -55,9 +55,26 @@ export const doCreateCourt = (data, cbSuccess, cbFailed) => {
 }
 
 export const doAddSchedule = (data, cbSuccess, cbFailed) => {
-    console.log(data)
     return {
         type: ADD_SCHEDULE,
+        data,
+        cbSuccess,
+        cbFailed
+    }
+}
+
+export const doEditSchedule = (data, cbSuccess, cbFailed) => {
+    return {
+        type: EDIT_SCHEDULE,
+        data,
+        cbSuccess,
+        cbFailed
+    }
+}
+
+export const doDeleteSchedule = (data, cbSuccess, cbFailed) => {
+    return {
+        type: DELETE_SCHEDULE,
         data,
         cbSuccess,
         cbFailed
